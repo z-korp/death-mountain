@@ -38,6 +38,10 @@ interface UIState {
   setAdvancedMode: (advanced: boolean) => void
   advancedMode: boolean
 
+  // Show Item Stats toggle (shows stats on equipment slots instead of images)
+  showItemStats: boolean
+  setShowItemStats: (show: boolean) => void
+
   // Payment preferences
   defaultPaymentToken: string
   setDefaultPaymentToken: (token: string) => void
@@ -74,6 +78,10 @@ export const useUIStore = create<UIState>()(
       setAdvancedMode: () => {},
       advancedMode: true,
 
+      // Show Item Stats toggle
+      showItemStats: false,
+      setShowItemStats: (show) => set({ showItemStats: show }),
+
       // Client preferences
       setUseMobileClient: (useMobile) => set({ useMobileClient: useMobile }),
       useMobileClient: false,
@@ -98,6 +106,7 @@ export const useUIStore = create<UIState>()(
         referralClicked: state.referralClicked,
         advancedMode: state.advancedMode,
         defaultPaymentToken: state.defaultPaymentToken,
+        showItemStats: state.showItemStats,
       }),
       merge: (persistedState, currentState) => {
         const state = persistedState as Partial<UIState> & { skipCombatDelays?: boolean };
@@ -107,6 +116,7 @@ export const useUIStore = create<UIState>()(
           fastBattle: state.fastBattle ?? state.skipCombatDelays ?? currentState.fastBattle,
           advancedMode: true, // Always force advancedMode to true regardless of persisted state
           defaultPaymentToken: state.defaultPaymentToken ?? currentState.defaultPaymentToken,
+          showItemStats: state.showItemStats ?? currentState.showItemStats,
         };
       },
     }

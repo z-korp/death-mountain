@@ -23,12 +23,33 @@ const equipmentSlots = [
   { key: 'head' as EquipmentSlot, label: 'Head', style: { top: '35px', left: '50%', transform: 'translate(-50%, 0)' }, icon: '/images/types/head.svg' },
   { key: 'chest' as EquipmentSlot, label: 'Chest', style: { top: '95px', left: '50%', transform: 'translate(-50%, 0)' }, icon: '/images/types/chest.svg' },
   { key: 'waist' as EquipmentSlot, label: 'Waist', style: { top: '155px', left: '50%', transform: 'translate(-50%, 0)' }, icon: '/images/types/waist.svg' },
-  { key: 'foot' as EquipmentSlot, label: 'Feet', style: { top: '215px', left: '50%', transform: 'translate(-50%, 0)' }, icon: '/images/types/foot.svg' },
+  { key: 'foot' as EquipmentSlot, label: 'Foot', style: { top: '215px', left: '50%', transform: 'translate(-50%, 0)' }, icon: '/images/types/foot.svg' },
   { key: 'hand' as EquipmentSlot, label: 'Hands', style: { top: '125px', left: '8px' }, icon: '/images/types/hand.svg' },
   { key: 'ring' as EquipmentSlot, label: 'Ring', style: { top: '125px', right: '8px' }, icon: '/images/types/ring.svg' },
   { key: 'weapon' as EquipmentSlot, label: 'Weapon', style: { top: '185px', left: '8px' }, icon: '/images/types/weapon.svg' },
   { key: 'neck' as EquipmentSlot, label: 'Neck', style: { top: '65px', right: '8px' }, icon: '/images/types/neck.svg' },
 ];
+
+const STAT_ABBREV: Record<string, string> = {
+  strength: 'STR',
+  dexterity: 'DEX',
+  vitality: 'VIT',
+  intelligence: 'INT',
+  wisdom: 'WIS',
+  charisma: 'CHA',
+  luck: 'LCK',
+};
+
+// Get item stats for display
+function getItemStatsForDisplay(item: Item, itemSpecialsSeed: number): Array<{ stat: string; value: number }> {
+  const stats = ItemUtils.fullItemBoost(item, itemSpecialsSeed, {
+    dexterity: 0, strength: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0, luck: 0
+  });
+  
+  return Object.entries(stats)
+    .filter(([, value]) => value > 0)
+    .map(([stat, value]) => ({ stat, value }));
+}
 
 interface InventoryOverlayProps {
   disabledEquip?: boolean;
@@ -44,7 +65,7 @@ function CharacterEquipment({ isDropMode, itemsToDrop, onItemClick, newItems, on
   previewEquipped?: Record<string, Item>;
 }) {
   const { adventurer, beast, bag, equipGearPreset } = useGameStore();
-  const { advancedMode } = useUIStore();
+  const { advancedMode, showItemStats } = useUIStore();
   const { presets } = useGearPresets(adventurer ?? null, bag, advancedMode);
   const isPresetDisabled = isDropMode || !!disabledEquip;
 
@@ -178,64 +199,82 @@ function CharacterEquipment({ isDropMode, itemsToDrop, onItemClick, newItems, on
                 onMouseEnter={() => item?.id && !isPreview && onItemHover(item.id)}
               >
                 {item?.id && metadata ? (
-                  <Box sx={styles.itemImageContainer}>
-                    <Box
-                      sx={[
-                        styles.itemGlow,
-                        { backgroundColor: tierColor }
-                      ]}
-                    />
-                    {(isNameMatchDanger || isNameMatchPower) && (
+                  showItemStats ? (
+                    // Stats view - show stats instead of item image
+                    <Box sx={styles.itemStatsContainer}>
+                      {/* Stats Display (center) */}
+                      <Box sx={styles.itemStatsDisplay}>
+                        {getItemStatsForDisplay(item, adventurer?.item_specials_seed || 0).map(({ stat, value }) => (
+                          <Typography key={stat} sx={styles.itemStatText}>
+                            +{value} {STAT_ABBREV[stat]}
+                          </Typography>
+                        ))}
+                        {getItemStatsForDisplay(item, adventurer?.item_specials_seed || 0).length === 0 && (
+                          <Typography sx={styles.itemStatTextEmpty}>-</Typography>
+                        )}
+                      </Box>
+                    </Box>
+                  ) : (
+                    // Normal view - show item image
+                    <Box sx={styles.itemImageContainer}>
                       <Box
                         sx={[
-                          styles.nameMatchGlow,
-                          isNameMatchDanger ? styles.nameMatchDangerGlow : styles.nameMatchPowerGlow
+                          styles.itemGlow,
+                          { backgroundColor: tierColor }
                         ]}
                       />
-                    )}
-                    <img
-                      src={metadata.imageUrl}
-                      alt={metadata.name}
-                      style={{ ...styles.equipmentIcon, position: 'relative' }}
-                    />
-                    {hasSpecials && (
-                      <Box sx={[styles.starOverlay, hasGoldSpecials ? styles.goldStarOverlay : styles.silverStarOverlay]}>
-                        <Star sx={[styles.starIcon, hasGoldSpecials ? styles.goldStarIcon : styles.silverStarIcon]} />
-                      </Box>
-                    )}
-                    {/* Damage Indicator Overlay */}
-                    {(damage > 0 || damageTaken > 0) && (
-                      <Box sx={[
-                        styles.damageIndicator,
-                        isArmorSlot ? styles.damageIndicatorRed : styles.damageIndicatorGreen
-                      ]}>
-                        <Typography sx={[
-                          styles.damageIndicatorText,
-                          isArmorSlot ? styles.damageIndicatorTextRed : styles.damageIndicatorTextGreen
+                      {(isNameMatchDanger || isNameMatchPower) && (
+                        <Box
+                          sx={[
+                            styles.nameMatchGlow,
+                            isNameMatchDanger ? styles.nameMatchDangerGlow : styles.nameMatchPowerGlow
+                          ]}
+                        />
+                      )}
+                      <img
+                        src={metadata.imageUrl}
+                        alt={metadata.name}
+                        style={{ ...styles.equipmentIcon, position: 'relative' }}
+                      />
+                      {hasSpecials && (
+                        <Box sx={[styles.starOverlay, hasGoldSpecials ? styles.goldStarOverlay : styles.silverStarOverlay]}>
+                          <Star sx={[styles.starIcon, hasGoldSpecials ? styles.goldStarIcon : styles.silverStarIcon]} />
+                        </Box>
+                      )}
+                      {/* Damage Indicator Overlay */}
+                      {(damage > 0 || damageTaken > 0) && (
+                        <Box sx={[
+                          styles.damageIndicator,
+                          isArmorSlot ? styles.damageIndicatorRed : styles.damageIndicatorGreen
                         ]}>
-                          {isArmorSlot ? `-${damageTaken}` : `+${damage}`}
-                        </Typography>
+                          <Typography sx={[
+                            styles.damageIndicatorText,
+                            isArmorSlot ? styles.damageIndicatorTextRed : styles.damageIndicatorTextGreen
+                          ]}>
+                            {isArmorSlot ? `-${damageTaken}` : `+${damage}`}
+                          </Typography>
+                        </Box>
+                      )}
+                      {/* Level Label */}
+                      <Box sx={styles.levelLabel}>
+                        {level}
                       </Box>
-                    )}
-                    {/* Level Label */}
-                    <Box sx={styles.levelLabel}>
-                      {level}
+                      {/* Crit Damage Indicator (Advanced Mode) */}
+                      {advancedMode && (critDamage > 0 || critDamageTaken > 0) && (
+                        <Box sx={[
+                          styles.critDamageIndicator,
+                          isArmorSlot ? styles.critDamageIndicatorRed : styles.critDamageIndicatorGreen
+                        ]}>
+                          <Typography sx={[
+                            styles.damageIndicatorText,
+                            isArmorSlot ? styles.damageIndicatorTextRed : styles.damageIndicatorTextGreen
+                          ]}>
+                            {isArmorSlot ? `-${critDamageTaken}` : `+${critDamage}`}
+                          </Typography>
+                        </Box>
+                      )}
                     </Box>
-                    {/* Crit Damage Indicator (Advanced Mode) */}
-                    {advancedMode && (critDamage > 0 || critDamageTaken > 0) && (
-                      <Box sx={[
-                        styles.critDamageIndicator,
-                        isArmorSlot ? styles.critDamageIndicatorRed : styles.critDamageIndicatorGreen
-                      ]}>
-                        <Typography sx={[
-                          styles.damageIndicatorText,
-                          isArmorSlot ? styles.damageIndicatorTextRed : styles.damageIndicatorTextGreen
-                        ]}>
-                          {isArmorSlot ? `-${critDamageTaken}` : `+${critDamage}`}
-                        </Typography>
-                      </Box>
-                    )}
-                  </Box>
+                  )
                 ) : (
                   <Box sx={styles.emptySlot} title={slot.label}>
                     <img src={slot.icon} alt={slot.label} style={{ width: 26, height: 26, opacity: 0.5 }} />
@@ -1166,5 +1205,35 @@ const styles = {
     fontSize: '12px',
     fontWeight: 600,
     textTransform: 'uppercase',
+  },
+  // Item Stats View styles
+  itemStatsContainer: {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(20, 35, 20, 0.95)',
+  },
+
+  itemStatsDisplay: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '1px',
+    zIndex: 5,
+  },
+  itemStatText: {
+    fontSize: '11px',
+    fontWeight: 'bold',
+    color: '#4caf50',
+    lineHeight: 1.2,
+    textShadow: '0 1px 2px rgba(0, 0, 0, 0.9)',
+  },
+  itemStatTextEmpty: {
+    fontSize: '12px',
+    color: 'rgba(255, 255, 255, 0.3)',
   },
 };

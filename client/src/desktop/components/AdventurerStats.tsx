@@ -35,7 +35,7 @@ const STAT_DESCRIPTIONS = {
 } as const;
 
 export default function AdventurerStats() {
-  const { advancedMode } = useUIStore();
+  const { advancedMode, showItemStats, setShowItemStats } = useUIStore();
   const { adventurer, bag, beast, selectedStats, setSelectedStats, applyGearSuggestion } = useGameStore();
   const [suggestInProgress, setSuggestInProgress] = useState(false);
   const [suggestMessage, setSuggestMessage] = useState<string | null>(null);
@@ -43,6 +43,12 @@ export default function AdventurerStats() {
   const equippedItemStats = useMemo(() => {
     return ItemUtils.getEquippedItemStats(adventurer!, bag);
   }, [adventurer, bag]);
+
+  // Determine if toggle should be shown
+  const hasEquipmentBonusStats = Object.values(equippedItemStats).some(v => v > 0);
+  const hasPendingStatUpgrades = (adventurer?.stat_upgrades_available ?? 0) > 0;
+  const inCombat = !!beast;
+  const showItemStatsToggle = hasEquipmentBonusStats && !hasPendingStatUpgrades && !inCombat;
 
   // Track stat changes from equipment for animation
   const { changes: statChanges, version: statChangeVersion } = useStatChanges(adventurer?.stats);
@@ -167,7 +173,8 @@ export default function AdventurerStats() {
                     component="span"
                     key={`adv-${stat}-${statChangeVersion}`}
                     sx={{
-                      display: 'inline-block',
+                      display: 'inline-flex',
+                      alignItems: 'center',
                       color: selectedStats[stat as keyof typeof STAT_DESCRIPTIONS] > 0 ? '#4caf50' : '#d0c98d',
                       ...(statChanges[stat as keyof typeof STAT_DESCRIPTIONS] === 'increase' && {
                         animation: `${statIncrease} 1.5s ease-out`,
@@ -178,6 +185,11 @@ export default function AdventurerStats() {
                     }}
                   >
                     {totalStatValue}
+                    {showItemStats && equippedItemStats[stat as keyof typeof STAT_DESCRIPTIONS] > 0 && (
+                      <Box component="span" sx={{ color: '#4caf50', ml: 0.5 }}>
+                        (+{equippedItemStats[stat as keyof typeof STAT_DESCRIPTIONS]})
+                      </Box>
+                    )}
                   </Box>
                 </Typography>
 
@@ -270,15 +282,17 @@ export default function AdventurerStats() {
             </Button>}
 
             <Typography sx={{
-              width: '18px',
-              textAlign: 'center',
+              minWidth: '18px',
+              textAlign: 'right',
               pt: '1px',
+              whiteSpace: 'nowrap',
             }}>
               <Box
                 component="span"
                 key={`${stat}-${statChangeVersion}`}
                 sx={{
-                  display: 'inline-block',
+                  display: 'inline-flex',
+                  alignItems: 'center',
                   color: selectedStats[stat as keyof typeof STAT_DESCRIPTIONS] > 0 ? '#4caf50' : '#d0c98d',
                   ...(statChanges[stat as keyof typeof STAT_DESCRIPTIONS] === 'increase' && {
                     animation: `${statIncrease} 1.5s ease-out`,
@@ -289,6 +303,11 @@ export default function AdventurerStats() {
                 }}
               >
                 {adventurer?.stats?.[stat as keyof typeof STAT_DESCRIPTIONS]! + selectedStats[stat as keyof typeof STAT_DESCRIPTIONS]!}
+                {showItemStats && equippedItemStats[stat as keyof typeof STAT_DESCRIPTIONS] > 0 && (
+                  <Box component="span" sx={{ color: '#4caf50', ml: 0.5 }}>
+                    (+{equippedItemStats[stat as keyof typeof STAT_DESCRIPTIONS]})
+                  </Box>
+                )}
               </Box>
             </Typography>
 
@@ -328,6 +347,21 @@ export default function AdventurerStats() {
           </Box>
         )}
         {advancedMode ? renderAdvancedStatsView() : renderStatsView()}
+        
+        {/* Show Item Stats Toggle - visible when has equipment bonuses, no stat upgrades, not in combat */}
+        {showItemStatsToggle && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+            <Button
+              variant="contained"
+              onClick={() => setShowItemStats(!showItemStats)}
+              sx={[styles.itemStatsToggle, showItemStats && styles.itemStatsToggleActive]}
+            >
+              <Typography sx={styles.itemStatsToggleText}>
+                {showItemStats ? 'Hide Item Stats' : 'Show Item Stats'}
+              </Typography>
+            </Button>
+          </Box>
+        )}
         
         {/* Suggest Optimal Gear Button - shown during combat */}
         {advancedMode && beast && (
@@ -565,11 +599,12 @@ const styles = {
     wordBreak: 'break-word',
   },
   statValue: {
-    width: '26px',
-    textAlign: 'center',
+    minWidth: '26px',
+    textAlign: 'right',
     fontSize: '14px',
     pt: '1px',
     flexShrink: 0,
+    whiteSpace: 'nowrap',
   },
   advancedStatRow: {
     display: 'flex',
@@ -608,5 +643,28 @@ const styles = {
     fontSize: '11px',
     color: 'rgba(208, 201, 141, 0.8)',
     textAlign: 'center',
+  },
+  itemStatsToggle: {
+    width: '100%',
+    background: 'rgba(40, 50, 40, 0.95)',
+    borderRadius: '6px',
+    border: '2px solid #5a8a5c',
+    padding: '6px 12px',
+    boxShadow: '0 0 6px rgba(0, 0, 0, 0.3)',
+    '&:hover': {
+      background: 'rgba(50, 65, 50, 1)',
+      borderColor: '#70a072',
+    },
+  },
+  itemStatsToggleActive: {
+    background: 'rgba(50, 70, 50, 0.95)',
+    borderColor: '#80c080',
+    boxShadow: '0 0 8px rgba(128, 192, 128, 0.3)',
+  },
+  itemStatsToggleText: {
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#a0d0a0',
+    textTransform: 'none',
   },
 }; 
