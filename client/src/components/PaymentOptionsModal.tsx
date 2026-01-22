@@ -1,4 +1,4 @@
-import { getAvnuQuote, buildAvnuSwapCalls, formatSellAmount, getErrorMessage, ONE_TICKET, AVNU_INTEGRATOR_CONFIG } from "@/api/avnu";
+import { getAvnuQuote, executeGaslessSwap, formatSellAmount, getErrorMessage, ONE_TICKET, AVNU_INTEGRATOR_CONFIG } from "@/api/avnu";
 import { useController } from "@/contexts/controller";
 import { useDungeon } from "@/dojo/useDungeon";
 import { useUIStore } from "@/stores/uiStore";
@@ -319,8 +319,8 @@ export default function PaymentOptionsModal({
     useController();
   const { defaultPaymentToken } = useUIStore();
 
-  // Get account for AVNU swaps
-  const { address: accountAddress } = useAccount();
+  // Get account for AVNU swaps (account object needed for gasless execution)
+  const { address: accountAddress, account } = useAccount();
   const dungeon = useDungeon();
 
   // Get payment tokens from network config
@@ -486,22 +486,26 @@ export default function PaymentOptionsModal({
   };
 
   const buyDungeonTicket = async () => {
-    if (!currentQuote || !accountAddress) {
+    if (!currentQuote || !account) {
       console.error("No quote available or account not connected");
       return;
     }
 
     try {
-      // Build swap calls from the quote using AVNU
-      const swapCalls = await buildAvnuSwapCalls(
+      // Execute gasless swap - user pays gas fees in USDC
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const swapResult = await executeGaslessSwap(
+        account as any, // Cast to Account type for gasless execution
         currentQuote,
-        accountAddress
+        0.005 // 0.5% slippage
       );
 
-      // Execute the swap calls followed by dungeon entry
-      enterDungeon({ paymentType: "Ticket" }, swapCalls.calls);
+      console.log("Gasless swap executed:", swapResult.transactionHash);
+
+      // After swap completes, enter the dungeon with the ticket
+      enterDungeon({ paymentType: "Ticket" }, []);
     } catch (error) {
-      console.error("Error building swap calls:", error);
+      console.error("Error executing gasless swap:", error);
     }
   };
 
@@ -727,7 +731,7 @@ export default function PaymentOptionsModal({
                   )}
 
                   {/* Token Payment Option with Crypto/Fiat tabs */}
-                  {currentView === "token" && accountAddress && (
+                  {currentView === "token" && account && (
                     <motion.div
                       key="token-view"
                       initial={{ opacity: 0, y: 20 }}
@@ -743,7 +747,7 @@ export default function PaymentOptionsModal({
                         onTokenChange={handleTokenChange}
                         styles={styles}
                         buyDungeonTicket={buyDungeonTicket}
-                        walletAddress={accountAddress}
+                        walletAddress={account.address}
                         ticketPriceUsd={ticketPriceUsd}
                       />
                     </motion.div>

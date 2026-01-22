@@ -1,5 +1,13 @@
-import { getQuotes, quoteToCalls, type Quote, type AvnuCalls } from '@avnu/avnu-sdk';
+import { getQuotes, quoteToCalls, executeSwap, type Quote, type AvnuCalls } from '@avnu/avnu-sdk';
 import { formatUnits } from 'ethers';
+import { PaymasterRpc, type Account } from 'starknet';
+
+// AVNU Paymaster Configuration for gasless swaps
+const AVNU_PAYMASTER_URL = 'https://starknet.paymaster.avnu.fi';
+const AVNU_PAYMASTER_API_KEY = import.meta.env.VITE_AVNU_PAYMASTER_API_KEY || '';
+
+// USDC token address on mainnet for gas payment
+const USDC_ADDRESS = '0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8';
 
 // AVNU Integrator Configuration for zkorp
 export const AVNU_INTEGRATOR_CONFIG = {
@@ -103,6 +111,60 @@ export async function buildAvnuSwapCalls(
     throw createAvnuError(
       'BUILD_FAILED',
       error instanceof Error ? error.message : 'Failed to build swap calls'
+    );
+  }
+}
+
+export interface GaslessSwapResult {
+  transactionHash: string;
+}
+
+/**
+ * Execute a gasless swap using AVNU paymaster
+ * User pays gas fees in USDC instead of ETH
+ * @param account - The user's account (must be a starknet Account object)
+ * @param quote - The quote from getAvnuQuote
+ * @param slippage - Slippage tolerance (default: 0.5%)
+ */
+export async function executeGaslessSwap(
+  account: Account,
+  quote: Quote,
+  slippage: number = 0.005
+): Promise<GaslessSwapResult> {
+  try {
+    // Create paymaster provider for gasless transactions
+    const paymasterProvider = new PaymasterRpc({
+      nodeUrl: AVNU_PAYMASTER_URL,
+      headers: AVNU_PAYMASTER_API_KEY 
+        ? { 'x-paymaster-api-key': AVNU_PAYMASTER_API_KEY }
+        : undefined,
+    });
+
+    // Execute swap with gasless mode - user pays in USDC
+    const result = await executeSwap({
+      provider: account,
+      quote,
+      slippage,
+      paymaster: {
+        active: true,
+        provider: paymasterProvider,
+        params: {
+          version: '0x1',
+          feeMode: {
+            mode: 'default',
+            gasToken: USDC_ADDRESS,
+          },
+        },
+      },
+    });
+
+    return {
+      transactionHash: result.transactionHash,
+    };
+  } catch (error) {
+    throw createAvnuError(
+      'BUILD_FAILED',
+      error instanceof Error ? error.message : 'Failed to execute gasless swap'
     );
   }
 }
