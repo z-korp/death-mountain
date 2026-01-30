@@ -14,7 +14,7 @@ import { suggestBestCombatGear } from '@/utils/gearSuggestion';
 import { Box, Button, Checkbox, LinearProgress, Typography, keyframes } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useLottie } from 'lottie-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import strikeAnim from "../assets/animations/strike.json";
 import AnimatedText from '../components/AnimatedText';
 import BeastTooltip from '../components/BeastTooltip';
@@ -55,6 +55,18 @@ export default function BeastScreen({ setIsBattling }: BeastScreenProps) {
   const [simulationResult, setSimulationResult] = useState(defaultSimulationResult);
   const [simulationActionCount, setSimulationActionCount] = useState<number | null>(null);
   const [ownerName, setOwnerName] = useState<string | null>(null);
+
+  // Refs to capture damage values at animation start (prevents stale closure issues)
+  const playerDamageRef = useRef<number>(0);
+  const beastDamageRef = useRef<number>(0);
+  
+  // Refs for sequential animation playback (player damage shown first, then beast damage)
+  const isPlayerStrikePlaying = useRef<boolean>(false);
+  const pendingBeastAttack = useRef<{
+    damage: number;
+    location: string;
+    critical_hit: boolean;
+  } | null>(null);
 
   const hasNewItemsEquipped = useMemo(() => {
     if (!adventurer?.equipment || !adventurerState?.equipment) return false;
@@ -100,8 +112,18 @@ export default function BeastScreen({ setIsBattling }: BeastScreenProps) {
     autoplay: false,
     style: { position: 'absolute', width: '60%', height: '60%', top: '20%', right: '20%' },
     onComplete: () => {
-      setBeastHealth(prev => Math.max(0, prev - battleEvent?.attack?.damage!));
+      setBeastHealth(prev => Math.max(0, prev - playerDamageRef.current));
       strike.stop();
+      isPlayerStrikePlaying.current = false;
+      
+      // Play pending beast attack if queued (sequential animation)
+      if (pendingBeastAttack.current) {
+        const pending = pendingBeastAttack.current;
+        pendingBeastAttack.current = null;
+        beastDamageRef.current = pending.damage;
+        beastStrike.play();
+        setCombatLog(`${beast!.baseName} attacked your ${pending.location} for ${pending.damage} damage ${pending.critical_hit ? 'CRITICAL HIT!' : ''}`);
+      }
     }
   });
 
@@ -111,7 +133,7 @@ export default function BeastScreen({ setIsBattling }: BeastScreenProps) {
     autoplay: false,
     style: { position: 'absolute', width: '60%', height: '60%', top: '30%', right: '20%' },
     onComplete: () => {
-      setHealth(prev => Math.max(0, prev - battleEvent?.attack?.damage!));
+      setHealth(prev => Math.max(0, prev - beastDamageRef.current));
       beastStrike.stop();
     }
   });
@@ -125,6 +147,9 @@ export default function BeastScreen({ setIsBattling }: BeastScreenProps) {
   useEffect(() => {
     if (battleEvent && !skipCombat) {
       if (battleEvent.type === "attack") {
+        // Capture damage before animation starts to prevent stale closure
+        playerDamageRef.current = battleEvent.attack?.damage || 0;
+        isPlayerStrikePlaying.current = true;
         strike.play();
         if (!fastBattle) {
           setCombatLog(`You attacked ${beast!.baseName} for ${battleEvent.attack?.damage} damage ${battleEvent.attack?.critical_hit ? 'CRITICAL HIT!' : ''}`);
@@ -132,8 +157,19 @@ export default function BeastScreen({ setIsBattling }: BeastScreenProps) {
       }
 
       else if (battleEvent.type === "beast_attack") {
-        beastStrike.play();
-        setCombatLog(`${beast!.baseName} attacked your ${battleEvent.attack?.location} for ${battleEvent.attack?.damage} damage ${battleEvent.attack?.critical_hit ? 'CRITICAL HIT!' : ''}`);
+        // Queue beast attack if player strike is still playing (sequential animation)
+        if (isPlayerStrikePlaying.current) {
+          pendingBeastAttack.current = {
+            damage: battleEvent.attack?.damage || 0,
+            location: battleEvent.attack?.location || '',
+            critical_hit: battleEvent.attack?.critical_hit || false,
+          };
+        } else {
+          // Play immediately if no player strike is playing
+          beastDamageRef.current = battleEvent.attack?.damage || 0;
+          beastStrike.play();
+          setCombatLog(`${beast!.baseName} attacked your ${battleEvent.attack?.location} for ${battleEvent.attack?.damage} damage ${battleEvent.attack?.critical_hit ? 'CRITICAL HIT!' : ''}`);
+        }
       }
 
       else if (battleEvent.type === "flee") {
@@ -145,6 +181,9 @@ export default function BeastScreen({ setIsBattling }: BeastScreenProps) {
       }
 
       else if (battleEvent.type === "ambush") {
+        // Capture damage for ambush as well (beast attacking player)
+        beastDamageRef.current = battleEvent.attack?.damage || 0;
+        beastStrike.play();
         setCombatLog(`${beast!.baseName} ambushed your ${battleEvent.attack?.location} for ${battleEvent.attack?.damage} damage ${battleEvent.attack?.critical_hit ? 'CRITICAL HIT!' : ''}`);
       }
     }
