@@ -140,7 +140,7 @@ export default function WatchPage() {
 
     const events = await getGameEvents(gameId!);
 
-    if (gameState.adventurer.health > 0) {
+    if (gameState.adventurer.health > 0 && !beast) {
       if (subscription) {
         try {
           subscription.cancel();
