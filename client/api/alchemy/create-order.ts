@@ -12,6 +12,7 @@ import {
 
 interface CreateOrderRequest {
   walletAddress: string;
+  userName?: string;
   fiatAmount: number;
   fiatCurrency: string;
   cryptoCurrency: SupportedCrypto;
@@ -44,13 +45,14 @@ export default async function handler(
   try {
     const {
       walletAddress,
+      userName,
       fiatAmount,
       fiatCurrency = "USD",
       cryptoCurrency,
       gameCount = 1,
     } = req.body as CreateOrderRequest;
     
-    console.log("Parsed request:", { walletAddress, fiatAmount, fiatCurrency, cryptoCurrency, gameCount });
+    console.log("Parsed request:", { walletAddress, userName, fiatAmount, fiatCurrency, cryptoCurrency, gameCount });
 
     // Validate required fields
     if (!walletAddress) {
@@ -66,11 +68,12 @@ export default async function handler(
     }
 
     const formattedAddress = formatWalletAddress(walletAddress);
-    const uid = generateUidFromAddress(walletAddress);
+    // Use userName if provided, otherwise generate from address (max 36 chars)
+    const uid = userName || generateUidFromAddress(walletAddress);
     const merchantOrderNo = generateMerchantOrderNo();
 
     console.log("Formatted address:", formattedAddress);
-    console.log("Generated UID (max 36 chars):", uid, "length:", uid.length);
+    console.log("UID:", uid, "length:", uid.length);
 
     // Step 1: Get access token using wallet address as UID
     console.log("Calling getToken with uid:", uid);

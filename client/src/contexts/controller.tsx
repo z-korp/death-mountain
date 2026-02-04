@@ -24,6 +24,7 @@ import { useDungeon } from "@/dojo/useDungeon";
 export interface ControllerContext {
   account: any;
   address: string | undefined;
+  userName: string | undefined;
   playerName: string;
   isPending: boolean;
   tokenBalances: Record<string, string>;
@@ -222,6 +223,7 @@ export const ControllerProvider = ({ children }: PropsWithChildren) => {
         goldenPassIds,
         showTermsOfService,
         acceptTermsOfService,
+        userName,
 
         openProfile: () => (connector as any)?.controller?.openProfile(),
         openBuyTicket: () => (connector as any)?.controller?.openStarterPack(3),

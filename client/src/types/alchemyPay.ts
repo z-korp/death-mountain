@@ -11,6 +11,7 @@ export type OrderStatus =
 
 export interface CreateOrderRequest {
   walletAddress: string;
+  userName?: string;
   fiatAmount: number;
   fiatCurrency: string;
   cryptoCurrency: SupportedCrypto;

@@ -238,7 +238,7 @@ CryptoTabContent.displayName = "CryptoTabContent";
 
 // Fiat tab content component
 const FiatTabContent = memo(() => {
-  const { address } = useController();
+  const { address, userName } = useController();
   const [selectedCrypto, setSelectedCrypto] = useState<SupportedCrypto>("USDC");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -289,6 +289,7 @@ const FiatTabContent = memo(() => {
     try {
       const result = await createAlchemyOrder({
         walletAddress: address,
+        userName: userName || undefined,
         fiatAmount: parseFloat(estimatedAmount),
         fiatCurrency: "USD",
         cryptoCurrency: selectedCrypto,
