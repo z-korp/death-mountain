@@ -2,6 +2,7 @@ import GamePage from "@/desktop/pages/GamePage";
 import NotFoundPage from "@/desktop/pages/NotFoundPage";
 import LandingPage from "@/desktop/pages/StartPage";
 import WatchPage from "@/desktop/pages/WatchPage";
+import PaymentCallback from "@/pages/PaymentCallback";
 
 import { default as MobileGamePage } from "@/mobile/pages/GamePage";
 import { default as MobileNotFoundPage } from "@/mobile/pages/NotFoundPage";
@@ -74,6 +75,14 @@ export const desktopRoutes = [
     )
   },
   {
+    path: '/:dungeonId/payment/callback',
+    content: (
+      <DungeonRoute>
+        <PaymentCallback />
+      </DungeonRoute>
+    )
+  },
+  {
     path: '*',
     content: <NotFoundPage />
   },
@@ -105,6 +114,14 @@ export const mobileRoutes = [
     content: (
       <DungeonRoute>
         <MobileWatchPage />
+      </DungeonRoute>
+    )
+  },
+  {
+    path: '/:dungeonId/payment/callback',
+    content: (
+      <DungeonRoute>
+        <PaymentCallback />
       </DungeonRoute>
     )
   },

@@ -7,8 +7,10 @@ import { NETWORKS } from "@/utils/networkConfig";
 import { formatAmount } from "@/utils/utils";
 import CloseIcon from "@mui/icons-material/Close";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
+import PaymentIcon from "@mui/icons-material/Payment";
 import SportsEsportsOutlinedIcon from "@mui/icons-material/SportsEsportsOutlined";
 import TokenIcon from "@mui/icons-material/Token";
+import { FiatPaymentView } from "./FiatPaymentView";
 import {
   Box,
   Button,
@@ -267,7 +269,7 @@ export default function PaymentOptionsModal({
 
   const [selectedToken, setSelectedToken] = useState("");
   const [currentView, setCurrentView] = useState<
-    "golden" | "dungeon" | "token" | "credit" | null
+    "golden" | "dungeon" | "token" | "credit" | "fiat" | null
   >(null);
   const [tokenQuote, setTokenQuote] = useState<{
     amount: string;
@@ -697,6 +699,13 @@ export default function PaymentOptionsModal({
                       </Box>
                     </MotionWrapper>
                   )}
+
+                  {/* Fiat Payment Option (Alchemy Pay) */}
+                  {currentView === "fiat" && (
+                    <MotionWrapper viewKey="fiat">
+                      <FiatPaymentView styles={styles} />
+                    </MotionWrapper>
+                  )}
                 </AnimatePresence>
               </Box>
 
@@ -752,17 +761,36 @@ export default function PaymentOptionsModal({
                       ></Link>
                     ))}
 
-                  {/* TODO: Temporarily disabled - waiting for additional support from Cartridge */}
-                  {/* {currentView === "token" && (
+                  {/* Token view footer links */}
+                  {currentView === "token" && (
                     <Link
                       component="button"
-                      onClick={() => openBuyTicket()}
+                      onClick={() => setCurrentView("fiat")}
                       sx={styles.footerLink}
                     >
-                      Pay with other wallets
+                      Pay with card instead
                     </Link>
-                  )} */}
+                  )}
 
+                  {/* Fiat view footer links */}
+                  {currentView === "fiat" &&
+                    (userTokens.length > 0 ? (
+                      <Link
+                        component="button"
+                        onClick={() => setCurrentView("token")}
+                        sx={styles.footerLink}
+                      >
+                        Pay with crypto instead
+                      </Link>
+                    ) : dungeonTicketCount >= 1 ? (
+                      <Link
+                        component="button"
+                        onClick={() => setCurrentView("dungeon")}
+                        sx={styles.footerLink}
+                      >
+                        Use dungeon ticket
+                      </Link>
+                    ) : null)}
 
                   {currentView === "credit" &&
                     (userTokens.length > 0 ? (

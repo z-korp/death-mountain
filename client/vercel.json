@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "@vercel/node@3.0.0"
+    }
+  },
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -25,15 +30,48 @@
           "value": "public, max-age=604800, stale-while-revalidate=31536000"
         }
       ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
     }
   ],
   "rewrites": [
+    {
+      "source": "/api/alchemy/get-token",
+      "destination": "/api/alchemy/get-token"
+    },
+    {
+      "source": "/api/alchemy/create-order",
+      "destination": "/api/alchemy/create-order"
+    },
+    {
+      "source": "/api/alchemy/order-status",
+      "destination": "/api/alchemy/order-status"
+    },
+    {
+      "source": "/api/alchemy/webhook",
+      "destination": "/api/alchemy/webhook"
+    },
     {
       "source": "/assets/(.*)",
       "destination": "/assets/$1"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]
