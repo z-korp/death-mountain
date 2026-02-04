@@ -228,3 +228,14 @@ export function formatWalletAddress(address: string): string {
   }
   return address.toLowerCase();
 }
+
+/**
+ * Generate a UID from wallet address (max 36 chars for Alchemy Pay)
+ * Uses last 32 chars of address + 4 char prefix
+ */
+export function generateUidFromAddress(address: string): string {
+  const formatted = formatWalletAddress(address);
+  // Take last 34 characters (including 0x prefix style)
+  // UID max is 36, so we use "dm" prefix + last 34 chars
+  return "dm" + formatted.slice(-34);
+}

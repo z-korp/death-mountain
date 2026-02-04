@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import {
   alchemyRequest,
   formatWalletAddress,
+  generateUidFromAddress,
   generateMerchantOrderNo,
   storeOrder,
   ALCHEMY_CONFIG,
@@ -65,14 +66,21 @@ export default async function handler(
     }
 
     const formattedAddress = formatWalletAddress(walletAddress);
+    const uid = generateUidFromAddress(walletAddress);
     const merchantOrderNo = generateMerchantOrderNo();
 
+    console.log("Formatted address:", formattedAddress);
+    console.log("Generated UID (max 36 chars):", uid, "length:", uid.length);
+
     // Step 1: Get access token using wallet address as UID
+    console.log("Calling getToken with uid:", uid);
     const tokenResult = await alchemyRequest<AlchemyTokenResponse>(
       "POST",
       "/open/api/v4/merchant/getToken",
-      { uid: formattedAddress }
+      { uid }
     );
+    
+    console.log("Token result:", JSON.stringify(tokenResult));
 
     if (!tokenResult.success || !tokenResult.data) {
       console.error("Failed to get access token:", tokenResult.error);
