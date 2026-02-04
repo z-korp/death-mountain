@@ -10,16 +10,16 @@ import type { SupportedCrypto } from "@/types/alchemyPay";
 import CloseIcon from "@mui/icons-material/Close";
 import TokenIcon from "@mui/icons-material/Token";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
 import {
   Box,
   Button,
   IconButton,
   Menu,
   MenuItem,
+  Slider,
   Tab,
   Tabs,
+  TextField,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
@@ -239,24 +239,34 @@ CryptoTabContent.displayName = "CryptoTabContent";
 // Fiat tab content component
 const FiatTabContent = memo(() => {
   const { address } = useController();
-  const [gameCount, setGameCount] = useState(1);
   const [selectedCrypto, setSelectedCrypto] = useState<SupportedCrypto>("USDC");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const TICKET_PRICE_USD = 1;
-  const MIN_GAMES = 1;
-  const MAX_GAMES = 10;
+  // Pricing configuration
+  const GAME_PRICE_USD = 0.6; // Price per game in USD
+  const MIN_PAYMENT_USD = 1; // Minimum payment amount
+  const MAX_GAMES = 20;
+  const FEE_BUFFER = 1.1; // 10% buffer for fees
 
-  const estimatedAmount = (gameCount * TICKET_PRICE_USD * 1.1).toFixed(2);
+  // Calculate minimum games based on minimum payment
+  const MIN_GAMES = Math.ceil(MIN_PAYMENT_USD / GAME_PRICE_USD);
+  
+  const [gameCount, setGameCount] = useState(MIN_GAMES);
 
-  const handleIncrement = useCallback(() => {
-    setGameCount((prev) => Math.min(prev + 1, MAX_GAMES));
+  // Calculate estimated amount
+  const estimatedAmount = (gameCount * GAME_PRICE_USD * FEE_BUFFER).toFixed(2);
+
+  const handleSliderChange = useCallback((_: Event, value: number | number[]) => {
+    setGameCount(value as number);
   }, []);
 
-  const handleDecrement = useCallback(() => {
-    setGameCount((prev) => Math.max(prev - 1, MIN_GAMES));
-  }, []);
+  const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value, 10);
+    if (!isNaN(value)) {
+      setGameCount(Math.min(Math.max(value, MIN_GAMES), MAX_GAMES));
+    }
+  }, [MIN_GAMES]);
 
   const handleCryptoChange = useCallback(
     (_: React.MouseEvent<HTMLElement>, value: SupportedCrypto | null) => {
@@ -323,59 +333,80 @@ const FiatTabContent = memo(() => {
         </Box>
       </Box>
 
-      {/* Game Count Selector */}
-      <Box sx={{ px: 2, mb: 2 }}>
-        <Typography
-          sx={{ fontSize: 12, color: "text.secondary", mb: 1, opacity: 0.8 }}
-        >
-          Number of Games
-        </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 2,
-          }}
-        >
-          <IconButton
-            onClick={handleDecrement}
-            disabled={gameCount <= MIN_GAMES}
-            sx={{
-              border: "1px solid rgba(208, 201, 141, 0.3)",
-              "&:hover": { background: "rgba(208, 201, 141, 0.1)" },
-            }}
-          >
-            <RemoveIcon sx={{ color: "#d0c98d", fontSize: 18 }} />
-          </IconButton>
-          <Typography
-            sx={{
-              fontSize: 24,
-              fontWeight: 700,
-              minWidth: 40,
-              textAlign: "center",
-            }}
-          >
-            {gameCount}
+      {/* Game Count Selector with Slider */}
+      <Box sx={{ px: 3, mb: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+          <Typography sx={{ fontSize: 12, color: "#d0c98d", opacity: 0.9 }}>
+            Number of Games
           </Typography>
-          <IconButton
-            onClick={handleIncrement}
-            disabled={gameCount >= MAX_GAMES}
-            sx={{
-              border: "1px solid rgba(208, 201, 141, 0.3)",
-              "&:hover": { background: "rgba(208, 201, 141, 0.1)" },
+          <TextField
+            value={gameCount}
+            onChange={handleInputChange}
+            type="number"
+            size="small"
+            inputProps={{ 
+              min: MIN_GAMES, 
+              max: MAX_GAMES,
+              style: { 
+                textAlign: "center", 
+                width: 50,
+                padding: "4px 8px",
+                color: "#d0c98d",
+              }
             }}
-          >
-            <AddIcon sx={{ color: "#d0c98d", fontSize: 18 }} />
-          </IconButton>
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                background: "rgba(0, 0, 0, 0.3)",
+                border: "1px solid rgba(208, 201, 141, 0.3)",
+                borderRadius: 1,
+                "& fieldset": { border: "none" },
+              },
+              "& input": { color: "#d0c98d" },
+            }}
+          />
         </Box>
+        <Slider
+          value={gameCount}
+          onChange={handleSliderChange}
+          min={MIN_GAMES}
+          max={MAX_GAMES}
+          step={1}
+          marks={[
+            { value: MIN_GAMES, label: `${MIN_GAMES}` },
+            { value: 10, label: "10" },
+            { value: MAX_GAMES, label: `${MAX_GAMES}` },
+          ]}
+          sx={{
+            color: "#d0c98d",
+            "& .MuiSlider-thumb": {
+              backgroundColor: "#d0c98d",
+              "&:hover, &.Mui-focusVisible": {
+                boxShadow: "0 0 0 8px rgba(208, 201, 141, 0.16)",
+              },
+            },
+            "& .MuiSlider-track": {
+              backgroundColor: "#d0c98d",
+            },
+            "& .MuiSlider-rail": {
+              backgroundColor: "rgba(208, 201, 141, 0.3)",
+            },
+            "& .MuiSlider-mark": {
+              backgroundColor: "rgba(208, 201, 141, 0.5)",
+            },
+            "& .MuiSlider-markLabel": {
+              color: "rgba(208, 201, 141, 0.7)",
+              fontSize: 11,
+            },
+          }}
+        />
+        <Typography sx={{ fontSize: 11, color: "text.secondary", opacity: 0.6, mt: 0.5 }}>
+          ${GAME_PRICE_USD.toFixed(2)} per game • Min {MIN_GAMES} games (${MIN_PAYMENT_USD} minimum)
+        </Typography>
       </Box>
 
       {/* Crypto Selector */}
-      <Box sx={{ px: 2, mb: 2 }}>
-        <Typography
-          sx={{ fontSize: 12, color: "text.secondary", mb: 1, opacity: 0.8 }}
-        >
+      <Box sx={{ px: 3, mb: 2 }}>
+        <Typography sx={{ fontSize: 12, color: "#d0c98d", mb: 1, opacity: 0.9 }}>
           Receive as
         </Typography>
         <ToggleButtonGroup
@@ -385,7 +416,7 @@ const FiatTabContent = memo(() => {
           fullWidth
           sx={{
             "& .MuiToggleButton-root": {
-              color: "text.secondary",
+              color: "rgba(208, 201, 141, 0.5)",
               borderColor: "rgba(208, 201, 141, 0.3)",
               "&.Mui-selected": {
                 background: "rgba(208, 201, 141, 0.2)",
@@ -406,7 +437,7 @@ const FiatTabContent = memo(() => {
       {/* Estimated Amount */}
       <Box sx={styles.costDisplay}>
         <Typography sx={styles.costText}>
-          Estimated: ~${estimatedAmount} USD
+          Total: ~${estimatedAmount} USD for {gameCount} game{gameCount > 1 ? "s" : ""}
         </Typography>
         <Typography
           sx={{ fontSize: 11, color: "text.secondary", opacity: 0.6, mt: 0.5 }}
@@ -443,7 +474,7 @@ const FiatTabContent = memo(() => {
             <CircularProgress size={20} sx={{ color: "#1a2f1a" }} />
           ) : (
             <Typography sx={styles.buttonText}>
-              {!address ? "Connect Wallet" : `Pay $${estimatedAmount}`}
+              {!address ? "Connect Wallet" : `Buy ${gameCount} Game${gameCount > 1 ? "s" : ""} for $${estimatedAmount}`}
             </Typography>
           )}
         </Button>
