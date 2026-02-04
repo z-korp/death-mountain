@@ -119,6 +119,12 @@ export default async function handler(
       callbackUrl: `${apiUrl}/api/alchemy/webhook`,
     };
 
+    console.log("=== CREATE ORDER PAYLOAD ===");
+    console.log("Order body:", JSON.stringify(orderBody, null, 2));
+    console.log("Network:", ALCHEMY_CONFIG.network);
+    console.log("Base URL:", ALCHEMY_CONFIG.baseUrl);
+    console.log("Access Token (first 50 chars):", accessToken.substring(0, 50) + "...");
+
     const orderResult = await alchemyRequest<AlchemyOrderResponse>(
       "POST",
       "/open/api/v4/merchant/trade/create",

@@ -167,15 +167,26 @@ export async function alchemyRequest<T>(
 ): Promise<{ success: boolean; data?: T; error?: string; returnCode?: string }> {
   const headers = getApiHeaders(method, path, body, accessToken);
   const url = `${ALCHEMY_CONFIG.baseUrl}${path}`;
+  const sortedBody = body ? sortObjectKeys(body) : undefined;
+
+  console.log("=== ALCHEMY API REQUEST ===");
+  console.log("URL:", url);
+  console.log("Method:", method);
+  console.log("Headers:", JSON.stringify(headers, null, 2));
+  console.log("Body (sorted):", sortedBody ? JSON.stringify(sortedBody, null, 2) : "none");
 
   try {
     const response = await fetch(url, {
       method,
       headers,
-      body: body ? JSON.stringify(sortObjectKeys(body)) : undefined,
+      body: sortedBody ? JSON.stringify(sortedBody) : undefined,
     });
 
     const result = await response.json();
+
+    console.log("=== ALCHEMY API RESPONSE ===");
+    console.log("Status:", response.status);
+    console.log("Response:", JSON.stringify(result, null, 2));
 
     if (result.success && result.returnCode === "0000") {
       return { success: true, data: result.data };
