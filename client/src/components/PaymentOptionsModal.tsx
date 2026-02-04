@@ -236,6 +236,10 @@ const CryptoTabContent = memo(
 
 CryptoTabContent.displayName = "CryptoTabContent";
 
+// Sandbox mode configuration
+const SANDBOX_MODE = import.meta.env.VITE_ALCHEMY_ENV !== "production";
+const SANDBOX_BSC_ADDRESS = "0x231b4D3aD5B07D1Ae6be86eb667f3E8E413304A9";
+
 // Fiat tab content component
 const FiatTabContent = memo(() => {
   const { address, userName } = useController();
@@ -245,12 +249,15 @@ const FiatTabContent = memo(() => {
 
   // Pricing configuration
   const GAME_PRICE_USD = 0.6; // Price per game in USD
-  const MIN_PAYMENT_USD = 1; // Minimum payment amount
+  const MIN_PAYMENT_USD = 1.05; // Minimum payment amount for USDC on BSC
   const MAX_GAMES = 20;
   const FEE_BUFFER = 1.1; // 10% buffer for fees
 
   // Calculate minimum games based on minimum payment
   const MIN_GAMES = Math.ceil(MIN_PAYMENT_USD / GAME_PRICE_USD);
+  
+  // In sandbox mode, use test BSC address; in production, use user's Starknet address
+  const paymentAddress = SANDBOX_MODE ? SANDBOX_BSC_ADDRESS : address;
   
   const [gameCount, setGameCount] = useState(MIN_GAMES);
 
@@ -288,7 +295,7 @@ const FiatTabContent = memo(() => {
 
     try {
       const result = await createAlchemyOrder({
-        walletAddress: address,
+        walletAddress: paymentAddress!, // Use BSC address in sandbox, Starknet in production
         userName: userName || undefined,
         fiatAmount: parseFloat(estimatedAmount),
         fiatCurrency: "USD",
@@ -318,7 +325,7 @@ const FiatTabContent = memo(() => {
       setError(err instanceof Error ? err.message : "Payment failed");
       setIsLoading(false);
     }
-  }, [address, estimatedAmount, selectedCrypto, gameCount]);
+  }, [address, paymentAddress, estimatedAmount, selectedCrypto, gameCount, userName]);
 
   return (
     <Box sx={styles.tabContent}>
@@ -445,6 +452,13 @@ const FiatTabContent = memo(() => {
         >
           Includes fees and price buffer
         </Typography>
+        {SANDBOX_MODE && (
+          <Typography
+            sx={{ fontSize: 10, color: "#FFA500", opacity: 0.8, mt: 0.5 }}
+          >
+            Sandbox mode: Using BSC test address
+          </Typography>
+        )}
       </Box>
 
       {/* Error Message */}
