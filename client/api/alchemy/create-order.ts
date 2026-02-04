@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import {
   alchemyRequest,
-  formatStarknetAddress,
+  formatWalletAddress,
   generateMerchantOrderNo,
   storeOrder,
   ALCHEMY_CONFIG,
@@ -58,7 +58,7 @@ export default async function handler(
       });
     }
 
-    const formattedAddress = formatStarknetAddress(walletAddress);
+    const formattedAddress = formatWalletAddress(walletAddress);
     const merchantOrderNo = generateMerchantOrderNo();
 
     // Step 1: Get access token using wallet address as UID
@@ -96,7 +96,7 @@ export default async function handler(
       cryptoCurrency: cryptoCurrency.toUpperCase(),
       depositType: 2,
       address: formattedAddress,
-      network: ALCHEMY_CONFIG.starknetNetwork,
+      network: ALCHEMY_CONFIG.network,
       payWayCode: "10001", // Credit card - can be made dynamic
       redirectUrl: `${frontendUrl}/survivor/payment/callback?orderId=${merchantOrderNo}`,
       callbackUrl: `${apiUrl}/api/alchemy/webhook`,

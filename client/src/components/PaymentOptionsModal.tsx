@@ -399,7 +399,7 @@ const FiatTabContent = memo(() => {
           }}
         >
           <ToggleButton value="USDC">USDC</ToggleButton>
-          <ToggleButton value="STRK">STRK</ToggleButton>
+          <ToggleButton value="ETH">ETH</ToggleButton>
         </ToggleButtonGroup>
       </Box>
 

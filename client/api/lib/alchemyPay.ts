@@ -8,12 +8,12 @@ export const ALCHEMY_CONFIG = {
     process.env.ALCHEMY_ENV === "production"
       ? "https://openapi.alchemypay.org"
       : "https://openapi-test.alchemypay.org",
-  // Starknet network code - verify with production API
-  starknetNetwork: process.env.ALCHEMY_STARKNET_NETWORK || "STARKNET",
+  // Network code: ARBITRUM for sandbox testing, STARKNET for production
+  network: process.env.ALCHEMY_NETWORK || "ARBITRUM",
 };
 
-// Supported cryptocurrencies on Starknet
-export const SUPPORTED_CRYPTOS = ["USDC", "STRK"] as const;
+// Supported cryptocurrencies (USDC available on both Arbitrum and Starknet)
+export const SUPPORTED_CRYPTOS = ["USDC", "ETH"] as const;
 export type SupportedCrypto = (typeof SUPPORTED_CRYPTOS)[number];
 
 // Order status types
@@ -220,9 +220,9 @@ export function verifyWebhookSignature(
 }
 
 /**
- * Parse Starknet address - ensure proper format
+ * Format wallet address - ensure proper format
  */
-export function formatStarknetAddress(address: string): string {
+export function formatWalletAddress(address: string): string {
   // Ensure address starts with 0x and is properly formatted
   if (!address.startsWith("0x")) {
     address = "0x" + address;
