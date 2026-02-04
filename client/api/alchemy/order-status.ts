@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getOrder, alchemyRequest, type OrderStatus } from "../lib/alchemyPay";
+import { getOrder, alchemyRequest, type OrderStatus } from "../lib/alchemyPay.js";
 
 interface AlchemyOrderQueryResponse {
   orderNo: string;

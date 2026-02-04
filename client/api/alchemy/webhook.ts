@@ -4,7 +4,7 @@ import {
   updateOrder,
   verifyWebhookSignature,
   type OrderStatus,
-} from "../lib/alchemyPay";
+} from "../lib/alchemyPay.js";
 
 interface AlchemyWebhookPayload {
   appId: string;

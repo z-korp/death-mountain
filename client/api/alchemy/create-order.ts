@@ -7,7 +7,7 @@ import {
   ALCHEMY_CONFIG,
   type SupportedCrypto,
   SUPPORTED_CRYPTOS,
-} from "../lib/alchemyPay";
+} from "../lib/alchemyPay.js";
 
 interface CreateOrderRequest {
   walletAddress: string;
@@ -31,6 +31,10 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
+  console.log("=== CREATE ORDER ENDPOINT HIT ===");
+  console.log("Method:", req.method);
+  console.log("Body:", JSON.stringify(req.body));
+  
   // Only allow POST
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -44,6 +48,8 @@ export default async function handler(
       cryptoCurrency,
       gameCount = 1,
     } = req.body as CreateOrderRequest;
+    
+    console.log("Parsed request:", { walletAddress, fiatAmount, fiatCurrency, cryptoCurrency, gameCount });
 
     // Validate required fields
     if (!walletAddress) {

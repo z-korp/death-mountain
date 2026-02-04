@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { alchemyRequest, formatWalletAddress } from "../lib/alchemyPay";
+import { alchemyRequest, formatWalletAddress } from "../lib/alchemyPay.js";
 
 interface GetTokenRequest {
   uid: string; // User's wallet address
