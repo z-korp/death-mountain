@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { alchemyRequest, formatStarknetAddress } from "../lib/alchemyPay";
+import { alchemyRequest, formatWalletAddress } from "../lib/alchemyPay";
 
 interface GetTokenRequest {
   uid: string; // User's wallet address
@@ -27,7 +27,7 @@ export default async function handler(
     }
 
     // Format the wallet address as UID
-    const formattedUid = formatStarknetAddress(uid);
+    const formattedUid = formatWalletAddress(uid);
 
     const result = await alchemyRequest<GetTokenResponse>(
       "POST",

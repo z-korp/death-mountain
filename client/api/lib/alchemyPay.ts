@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import * as crypto from "crypto";
 
 // Environment configuration
 export const ALCHEMY_CONFIG = {
@@ -70,11 +70,11 @@ export function cleanupExpiredOrders(): void {
   const now = Date.now();
   const expirationTime = 24 * 60 * 60 * 1000; // 24 hours
 
-  for (const [key, order] of orderStore.entries()) {
+  orderStore.forEach((order, key) => {
     if (now - order.createdAt > expirationTime) {
       orderStore.delete(key);
     }
-  }
+  });
 }
 
 /**
@@ -87,7 +87,7 @@ export function sortObjectKeys(obj: Record<string, unknown>): Record<string, unk
   }
 
   if (Array.isArray(obj)) {
-    return obj.map((item) => sortObjectKeys(item as Record<string, unknown>));
+    return obj.map((item) => sortObjectKeys(item as Record<string, unknown>)) as unknown as Record<string, unknown>;
   }
 
   const sortedKeys = Object.keys(obj).sort();

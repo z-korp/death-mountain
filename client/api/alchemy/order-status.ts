@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getOrder, alchemyRequest } from "../lib/alchemyPay";
+import { getOrder, alchemyRequest, type OrderStatus } from "../lib/alchemyPay";
 
 interface AlchemyOrderQueryResponse {
   orderNo: string;
@@ -59,7 +59,7 @@ export default async function handler(
         const alchemyStatus = queryResult.data.status;
         
         // Map Alchemy Pay status to our status
-        let mappedStatus = storedOrder.status;
+        let mappedStatus: OrderStatus = storedOrder.status;
         let cryptoReceived = false;
 
         if (alchemyStatus === "FINISHED") {
@@ -94,7 +94,7 @@ export default async function handler(
       cryptoAmount: storedOrder.cryptoAmount,
       txHash: storedOrder.txHash,
       gameCount: storedOrder.gameCount,
-      cryptoReceived: storedOrder.status === "FINISHED",
+      cryptoReceived: (storedOrder.status as string) === "FINISHED",
     });
   } catch (error) {
     console.error("Error in order-status endpoint:", error);

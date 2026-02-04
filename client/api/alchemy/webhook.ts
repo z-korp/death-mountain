@@ -76,7 +76,7 @@ export default async function handler(
     if (payload.newSignature && timestamp) {
       const isValid = verifyWebhookSignature(
         timestamp,
-        payload,
+        payload as unknown as Record<string, unknown>,
         payload.newSignature
       );
       if (!isValid) {
