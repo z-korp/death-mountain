@@ -1,4 +1,4 @@
-import * as crypto from "crypto";
+import { createHmac } from "node:crypto";
 
 // Environment configuration
 export const ALCHEMY_CONFIG = {
@@ -123,8 +123,7 @@ export function generateSign(
   }
 
   const content = timestamp + method.toUpperCase() + path + bodyString;
-  const sign = crypto
-    .createHmac("sha256", ALCHEMY_CONFIG.appSecret)
+  const sign = createHmac("sha256", ALCHEMY_CONFIG.appSecret)
     .update(content)
     .digest("base64");
 
