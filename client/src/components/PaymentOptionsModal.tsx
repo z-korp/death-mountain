@@ -239,7 +239,7 @@ CryptoTabContent.displayName = "CryptoTabContent";
 // Fiat tab content component
 const FiatTabContent = memo(() => {
   const { address, userName } = useController();
-  const [selectedCrypto, setSelectedCrypto] = useState<SupportedCrypto>("USDT");
+  const [selectedCrypto, setSelectedCrypto] = useState<SupportedCrypto>("USDC");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -430,8 +430,8 @@ const FiatTabContent = memo(() => {
             },
           }}
         >
+          <ToggleButton value="USDC">USDC</ToggleButton>
           <ToggleButton value="USDT">USDT</ToggleButton>
-          <ToggleButton value="BNB">BNB</ToggleButton>
         </ToggleButtonGroup>
       </Box>
 

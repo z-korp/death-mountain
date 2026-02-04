@@ -12,8 +12,8 @@ export const ALCHEMY_CONFIG = {
   network: process.env.ALCHEMY_NETWORK || "BSC",
 };
 
-// Supported cryptocurrencies (USDT on BSC for sandbox, USDC/STRK on Starknet for production)
-export const SUPPORTED_CRYPTOS = ["USDT", "BNB"] as const;
+// Supported cryptocurrencies on BSC (USDC min $1.05, USDT min $2.10)
+export const SUPPORTED_CRYPTOS = ["USDC", "USDT"] as const;
 export type SupportedCrypto = (typeof SUPPORTED_CRYPTOS)[number];
 
 // Order status types

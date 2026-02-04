@@ -1,6 +1,6 @@
 // Alchemy Pay types for frontend
 
-export type SupportedCrypto = "USDT" | "BNB";
+export type SupportedCrypto = "USDC" | "USDT";
 
 export type OrderStatus =
   | "PENDING"
@@ -64,5 +64,5 @@ export const DEFAULT_FIAT_CONFIG: FiatPaymentConfig = {
   minAmount: 1,
   maxAmount: 1000,
   supportedFiats: ["USD", "EUR", "GBP"],
-  supportedCryptos: ["USDT", "BNB"],
+  supportedCryptos: ["USDC", "USDT"],
 };
