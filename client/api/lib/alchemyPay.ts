@@ -8,12 +8,12 @@ export const ALCHEMY_CONFIG = {
     process.env.ALCHEMY_ENV === "production"
       ? "https://openapi.alchemypay.org"
       : "https://openapi-test.alchemypay.org",
-  // Network code: ARBITRUM for sandbox testing, STARKNET for production
-  network: process.env.ALCHEMY_NETWORK || "ARBITRUM",
+  // Network code: BSC for sandbox testing, STARKNET for production
+  network: process.env.ALCHEMY_NETWORK || "BSC",
 };
 
-// Supported cryptocurrencies (USDC available on both Arbitrum and Starknet)
-export const SUPPORTED_CRYPTOS = ["USDC", "ETH"] as const;
+// Supported cryptocurrencies (USDT on BSC for sandbox, USDC/STRK on Starknet for production)
+export const SUPPORTED_CRYPTOS = ["USDT", "BNB"] as const;
 export type SupportedCrypto = (typeof SUPPORTED_CRYPTOS)[number];
 
 // Order status types
