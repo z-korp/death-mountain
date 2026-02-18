@@ -252,12 +252,14 @@ const FiatTabContent = memo(({
   minFiatGames,
   strkPerGame,
   isMinting,
+  iframeKey,
 }: {
   walletAddress: string;
   totalFiatUsd: number | null;
   minFiatGames: number;
   strkPerGame: number | null;
   isMinting: boolean;
+  iframeKey: number;
 }) => {
   const [signature, setSignature] = useState<string | null>(null);
 
@@ -302,6 +304,7 @@ const FiatTabContent = memo(({
         )}
       </Box>
       <iframe
+        key={iframeKey}
         src={buildOnramperUrl(walletAddress, totalFiatUsd, signature)}
         title="Onramper Widget"
         width="100%"
@@ -387,6 +390,7 @@ export default function PaymentOptionsModal({
     loading: boolean;
     error?: string;
   }>({ amount: "", loading: false });
+  const [fiatIframeKey, setFiatIframeKey] = useState(0);
   const [ticketPriceUsd, setTicketPriceUsd] = useState<string | null>(null);
   const [strkQuoteForGames, setStrkQuoteForGames] = useState<number | null>(null);
   const [minFiatAmount, setMinFiatAmount] = useState(FALLBACK_MIN_FIAT_USD);
@@ -420,6 +424,7 @@ export default function PaymentOptionsModal({
       // Reset state on close
       setSpecialView(null);
       setIsMinting(false);
+      setFiatIframeKey(0);
       initialTabSet.current = false;
       initialStrkBalance.current = null;
       autoMintTriggered.current = false;
@@ -583,6 +588,7 @@ export default function PaymentOptionsModal({
       const onVisibilityChange = () => {
         if (document.visibilityState === "visible") {
           refreshTokenBalances();
+          setFiatIframeKey((prev) => prev + 1);
         }
       };
       document.addEventListener("visibilitychange", onVisibilityChange);
@@ -882,6 +888,7 @@ export default function PaymentOptionsModal({
                           minFiatGames={minFiatGames}
                           strkPerGame={strkQuoteForGames && minFiatGames > 0 ? strkQuoteForGames / minFiatGames : null}
                           isMinting={isMinting}
+                          iframeKey={fiatIframeKey}
                         />
                       )}
                     </motion.div>
