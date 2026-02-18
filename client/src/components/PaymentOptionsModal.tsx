@@ -77,7 +77,7 @@ const fetchOnramperMinFiat = async (): Promise<number> => {
 };
 
 // Onramper widget base URL with Loot Survivor theme
-const ONRAMPER_BASE_URL = `https://${ONRAMPER_DOMAIN}?apiKey=${ONRAMPER_API_KEY}&mode=buy&defaultCrypto=strk_starknet&onlyCryptoNetworks=starknet&themeName=dark&containerColor=0f1f0f&primaryColor=d0c98d&secondaryColor=1a2f1a&cardColor=182818&primaryTextColor=ffffff&secondaryTextColor=FFD700&borderRadius=0.5&wgBorderRadius=1&hideTopBar=true&redirectAtCheckout=false&skipTxScreen=true&skipTransactionScreen=true`;
+const ONRAMPER_BASE_URL = `https://${ONRAMPER_DOMAIN}?apiKey=${ONRAMPER_API_KEY}&mode=buy&defaultCrypto=strk_starknet&onlyCryptoNetworks=starknet&themeName=dark&containerColor=0f1f0f&primaryColor=d0c98d&secondaryColor=1a2f1a&cardColor=182818&primaryTextColor=ffffff&secondaryTextColor=FFD700&borderRadius=0.5&wgBorderRadius=1&hideTopBar=true&redirectAtCheckout=false`;
 
 // Fetch HMAC-SHA256 signature for sensitive URL params (required by Onramper prod)
 const fetchOnramperSignature = async (walletAddress: string): Promise<string | null> => {
@@ -413,6 +413,7 @@ export default function PaymentOptionsModal({
   // Refs for polling cleanup and auto-mint tracking
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fiatTabWasHidden = useRef(false);
   const initialTabSet = useRef(false);
   const initialStrkBalance = useRef<number | null>(null);
   const autoMintTriggered = useRef(false);
@@ -425,6 +426,7 @@ export default function PaymentOptionsModal({
       setSpecialView(null);
       setIsMinting(false);
       setFiatIframeKey(0);
+      fiatTabWasHidden.current = false;
       initialTabSet.current = false;
       initialStrkBalance.current = null;
       autoMintTriggered.current = false;
@@ -586,15 +588,25 @@ export default function PaymentOptionsModal({
 
       // Force refresh when user returns to the tab (browser throttles timers in background)
       const onVisibilityChange = () => {
+        if (document.visibilityState === "hidden") {
+          fiatTabWasHidden.current = true;
+          return;
+        }
+
         if (document.visibilityState === "visible") {
           refreshTokenBalances();
-          setFiatIframeKey((prev) => prev + 1);
+
+          if (fiatTabWasHidden.current) {
+            setFiatIframeKey((prev) => prev + 1);
+            fiatTabWasHidden.current = false;
+          }
         }
       };
       document.addEventListener("visibilitychange", onVisibilityChange);
 
       return () => {
         stopPolling();
+        fiatTabWasHidden.current = false;
         document.removeEventListener("visibilitychange", onVisibilityChange);
       };
     } else {
