@@ -33,7 +33,7 @@ const MAX_GAMES = 50;
 const FALLBACK_MIN_FIAT_USD = 12; // Fallback if API fetch fails (~$11.72 observed)
 const BALANCE_POLL_INTERVAL = 10_000; // 10 seconds
 const BALANCE_POLL_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-const ONRAMPER_TRANSITION_MASK_PX = 52;
+const ONRAMPER_TRANSITION_MASK_PX = 84;
 
 // Onramper API key from environment variable
 const ONRAMPER_API_KEY = import.meta.env.VITE_ONRAMPER_API_KEY || "";
