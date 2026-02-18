@@ -33,7 +33,7 @@ const MAX_GAMES = 50;
 const FALLBACK_MIN_FIAT_USD = 12; // Fallback if API fetch fails (~$11.72 observed)
 const BALANCE_POLL_INTERVAL = 10_000; // 10 seconds
 const BALANCE_POLL_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-const ONRAMPER_TRANSITION_MASK_PX = 84;
+const ONRAMPER_TRANSITION_MASK_PX = 68;
 
 // Onramper API key from environment variable
 const ONRAMPER_API_KEY = import.meta.env.VITE_ONRAMPER_API_KEY || "";
@@ -346,7 +346,7 @@ const FiatTabContent = memo(({
               right: 0,
               zIndex: 2,
               height: ONRAMPER_TRANSITION_MASK_PX,
-              background: "linear-gradient(180deg, rgba(10, 18, 10, 0.97) 0%, rgba(10, 18, 10, 0.9) 68%, rgba(10, 18, 10, 0) 100%)",
+              background: "linear-gradient(180deg, rgba(10, 18, 10, 0.995) 0%, rgba(10, 18, 10, 0.96) 70%, rgba(10, 18, 10, 0) 100%)",
               borderBottom: "1px solid rgba(208, 201, 141, 0.14)",
             }}
           />
