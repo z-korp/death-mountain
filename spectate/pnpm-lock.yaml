@@ -9,23 +9,23 @@ importers:
   .:
     dependencies:
       '@cartridge/connector':
-        specifier: ^0.10.1
-        version: 0.10.7(@starknet-react/core@5.0.3(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(@types/react@18.3.28)(bufferutil@4.1.0)(immer@10.2.0)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)
+        specifier: 0.10.5
+        version: 0.10.5(@starknet-react/core@5.0.3(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(@types/react@18.3.28)(bufferutil@4.1.0)(immer@10.2.0)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)
       '@cartridge/controller':
-        specifier: ^0.10.1
-        version: 0.10.7(@types/react@18.3.28)(bufferutil@4.1.0)(immer@10.2.0)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)
+        specifier: 0.10.5
+        version: 0.10.5(@types/react@18.3.28)(bufferutil@4.1.0)(immer@10.2.0)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)
       '@cloudflare/stream-react':
         specifier: ^1.9.3
         version: 1.9.3(react@18.3.1)
       '@dojoengine/core':
-        specifier: ^1.7.6
-        version: 1.8.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+        specifier: 1.8.0
+        version: 1.8.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
       '@dojoengine/sdk':
-        specifier: ^1.7.6
-        version: 1.9.0(@effect/platform@0.93.8(effect@3.19.19))(@opentelemetry/semantic-conventions@1.40.0)(@tanstack/react-query@5.90.21(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)
+        specifier: 1.8.0
+        version: 1.8.0(@tanstack/react-query@5.90.21(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)
       '@dojoengine/utils':
-        specifier: ^1.7.6
-        version: 1.8.4(bufferutil@4.1.0)(starknet@8.5.2)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@3.25.76)
+        specifier: 1.8.0
+        version: 1.8.0(bufferutil@4.1.0)(starknet@8.5.2)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@3.25.76)
       '@emotion/react':
         specifier: ^11.14.0
         version: 11.14.0(@types/react@18.3.28)(react@18.3.1)
@@ -73,7 +73,7 @@ importers:
         version: 2.4.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       metagame-sdk:
         specifier: 0.1.22
-        version: 0.1.22(@dojoengine/sdk@1.9.0(@effect/platform@0.93.8(effect@3.19.19))(@opentelemetry/semantic-conventions@1.40.0)(@tanstack/react-query@5.90.21(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76))(typescript@5.9.3)(zustand@4.5.7(@types/react@18.3.28)(immer@10.2.0)(react@18.3.1))
+        version: 0.1.22(@dojoengine/sdk@1.8.0(@tanstack/react-query@5.90.21(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76))(typescript@5.9.3)(zustand@4.5.7(@types/react@18.3.28)(immer@10.2.0)(react@18.3.1))
       notistack:
         specifier: ^3.0.2
         version: 3.0.2(csstype@3.2.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -379,16 +379,16 @@ packages:
   '@cartridge/account-wasm@0.7.13':
     resolution: {integrity: sha512-2/cFS96jN31N9piK2Hs/Egxz6cstJ9gV8pgBrqo5vSPckFv2yD9u/8euqDD26MJtLnDa59OYefNJBbKgsK9vHg==}
 
-  '@cartridge/connector@0.10.7':
-    resolution: {integrity: sha512-VuCGERfbn2450+v7DcdXzHwl90BevRP00ZIOV4q5R4hThW0DCLnsqSvqyKjyGMYLBMsazJS0Q9azVBl0BAbGNQ==}
+  '@cartridge/connector@0.10.5':
+    resolution: {integrity: sha512-vJaPZK9yY1KpWEYzKhDKBjjFuoMS9FEmTPsteXn8uXgpK1IEXoS5SFA9PNNws0ZBDW4Vv9CGohJcKb2WMVTyCA==}
     peerDependencies:
       '@starknet-react/core': ^5.0.1
 
   '@cartridge/controller-wasm@0.3.19':
     resolution: {integrity: sha512-dz+Clq3ji1+zQzylBUKJJrrTo4AgB98xIZgzfKkTk9yo24WfItZPoWZ8DhyJovVfrSHpi3WLa1cRvfHieoMIQg==}
 
-  '@cartridge/controller@0.10.7':
-    resolution: {integrity: sha512-fcAPIB8q3wkXYUjtbIBJV878kkRLHfqG0Hv4rIx+RqBaGQs4XLHvyTptyRtWEfHhjovkSyZ/TuZ+ySW9yRYApw==}
+  '@cartridge/controller@0.10.5':
+    resolution: {integrity: sha512-shOD3ADk5BMYGFDyYWNGyimOmkfpGWOHlPdnpyb22eutRN8Is88eUrTOO9Q54NGIkGmMUCiRXM9Ft0FyI+CQng==}
 
   '@cartridge/controller@0.7.13':
     resolution: {integrity: sha512-LBor+FxYtAETgj8+m+23BDVhwXEZ+FqtwaLAVBEen6oz4//o3pU+wP2xBl8YAtcAL6mJ8gYcOhfqdHK/Ux5rwQ==}
@@ -474,40 +474,40 @@ packages:
   '@coinbase/cdp-sdk@1.45.0':
     resolution: {integrity: sha512-4fgGOhyN9g/pTDE9NtsKUapwFsubrk9wafz8ltmBqSwWqLZWfWxXkVmzMYYFAf+qeGf/X9JqJtmvDVaHFlXWlw==}
 
-  '@dojoengine/core@1.8.8':
-    resolution: {integrity: sha512-q0eqP/DXKfpXzV68nCk84yFM2wNawLiuM1NLiq1+VvhqSFuLBk/iDaAOWSBf634RH5/9z0Lrd8S/ZQbrdVEd6w==}
+  '@dojoengine/core@1.8.0':
+    resolution: {integrity: sha512-yhlohSYOL/962twwoUCARHB60aOGm+VFByr03/UodZLf+kJuZ8a73l6A0wFQzKXC+6SVR26kkp5GNW/yXU1ZWA==}
     hasBin: true
 
-  '@dojoengine/grpc@1.8.7':
-    resolution: {integrity: sha512-2oiEQf6ADRfE0iBjEKBAyute0CblNKiwmSIXfLpiRI1TFrIVYjSVzJBcTt80c47nTCXabkdGDTVqMWGxFyMetA==}
+  '@dojoengine/grpc@1.8.0':
+    resolution: {integrity: sha512-MIEdk47r1B1UwiZ2H3Yz8jlagFevel3xiZ4CZpr1e86jUI+Hm1Hfgfpo9cZtIRFHDVv71C6AVpk0X/t/6qq6Jw==}
 
   '@dojoengine/recs@2.0.13':
     resolution: {integrity: sha512-Cgz4Unlnk2FSDoFTYKrJexX/KiSYPMFMxftxQkC+9LUKS5yNGkgFQM7xu4/L1HvpDAenL7NjUmH6ynRAS7Iifw==}
 
-  '@dojoengine/sdk@1.9.0':
-    resolution: {integrity: sha512-5ap9mJQnf6E0Ovs436dgUlsmVVDTJGuC48vgdxzUf491aF8i1mBFQ0yReL/4hqLc/U3WnKOOU8jKZMMIpWjahQ==}
+  '@dojoengine/sdk@1.8.0':
+    resolution: {integrity: sha512-NElSJo1oJeonpp9lSlD1JdCosFsPdpuIrYutZiWBW1ycf+QA2/5ain+m6yMrJuoSbctgrUNlZkZisxDEGWrL4w==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@tanstack/react-query': ^5.62.16
-      '@types/react': ^18.0.0 || ^19.0.0
-      '@types/react-dom': ^18.0.0 || ^19.0.0
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
+      '@types/react': ^18.3.1
+      '@types/react-dom': ^18.3.1
+      react: ^18.3.1
+      react-dom: ^18.3.1
       starknet: ^8.1.2
 
-  '@dojoengine/state@1.8.5':
-    resolution: {integrity: sha512-RkuKUfRUTgX+d4cmPILOP5su46/53GtPKxaZBiM8FtDek7ssKAEs45iPQCz+Dqsmr8HD98mCFMjE2DyusZhz6w==}
+  '@dojoengine/state@1.8.0':
+    resolution: {integrity: sha512-x7v5RoIhdmEHVpEMwc8bWCqMK349xu3mk/+u2pGCXvdI0srIo/Wa5/opy7Ju2yODH4jvJg3a7A5lBsO0FgyN8w==}
     peerDependencies:
       starknet: ^8.1.2
 
-  '@dojoengine/torii-client@1.8.2':
-    resolution: {integrity: sha512-A1aJFkBXgEcr5oObIMeiYsfkPd2VOFHdSARZ6D2IIc0BARz7rMa395yPbj5s4ZkTvhmdsovna/IJvSk0r4pFUA==}
+  '@dojoengine/torii-client@1.8.0':
+    resolution: {integrity: sha512-KCyMSpFzGTk+mSi+VDFWPXwu686U07bZN6sCKXj50m3tFqM/i+BHDf1KqUoHDFszYdgJzwvoqnLmFBBH79zrVg==}
 
-  '@dojoengine/torii-wasm@1.8.2':
-    resolution: {integrity: sha512-zPbZOGxX6uVU+7uHQ25c2LRGWFg4p/x0wi1YnRPWWXpMOmMBduXUAZlDhSaKBND7Ui3coEoCHSvoVs8S3mj1YQ==}
+  '@dojoengine/torii-wasm@1.8.0':
+    resolution: {integrity: sha512-rBTUIk/P2PfuC5+iRq5LYw+pTEoNWm/dfCq4Mz+HHmRC7DXZVkalmnHANl2gDU/ARLiwA2mzQhJfHupcly/heg==}
 
-  '@dojoengine/utils@1.8.4':
-    resolution: {integrity: sha512-lqIB1gsGGvzUpXfNymohds6NLlghLimDG9v3nFKyp4rjs2/HnIzeDIlzPgeYPfTslfoRE6FFAOsick2YT5Hzcg==}
+  '@dojoengine/utils@1.8.0':
+    resolution: {integrity: sha512-PGPetf+WhyIES0b4jz/xbAYxZR/0JZTNlGe+kD1ZaQMbJo3D5kKgKE04FmAliZKu107sHWXT9lEqLZap557UqA==}
     peerDependencies:
       starknet: ^8.1.2
 
@@ -516,40 +516,6 @@ packages:
     engines: {bun: '>=1', deno: '>=2', node: '>=16'}
     peerDependencies:
       '@noble/ciphers': ^1.0.0
-
-  '@effect/opentelemetry@0.59.3':
-    resolution: {integrity: sha512-0Ozqxc1AMMnOu18Iqqcf8rokyrdvHCYaJzUEDQpi5pt7z+C5zhv5GjFMI9OxMgGRBiGxsY63ZUth+Q6w8F8KhQ==}
-    peerDependencies:
-      '@effect/platform': ^0.93.8
-      '@opentelemetry/api': ^1.9
-      '@opentelemetry/resources': ^2.0.0
-      '@opentelemetry/sdk-logs': '>=0.203.0 <0.300.0'
-      '@opentelemetry/sdk-metrics': ^2.0.0
-      '@opentelemetry/sdk-trace-base': ^2.0.0
-      '@opentelemetry/sdk-trace-node': ^2.0.0
-      '@opentelemetry/sdk-trace-web': ^2.0.0
-      '@opentelemetry/semantic-conventions': ^1.33.0
-      effect: ^3.19.12
-    peerDependenciesMeta:
-      '@opentelemetry/api':
-        optional: true
-      '@opentelemetry/resources':
-        optional: true
-      '@opentelemetry/sdk-logs':
-        optional: true
-      '@opentelemetry/sdk-metrics':
-        optional: true
-      '@opentelemetry/sdk-trace-base':
-        optional: true
-      '@opentelemetry/sdk-trace-node':
-        optional: true
-      '@opentelemetry/sdk-trace-web':
-        optional: true
-
-  '@effect/platform@0.93.8':
-    resolution: {integrity: sha512-xTEy6fyTy4ijmFC3afKgtvYtn/JyPoIov4ZSUWJZUv3VeOcUPNGrrqG6IJlWkXs3NhvSywKv7wc1kw3epCQVZw==}
-    peerDependencies:
-      effect: ^3.19.12
 
   '@emotion/babel-plugin@11.13.5':
     resolution: {integrity: sha512-pxHCpT2ex+0q+HH91/zsdHkw/lXd468DIN2zvfvLtPKLLMo6gQj7oLObq8PhkrxOZb/gGCq03S3Z7PDhS8pduQ==}
@@ -999,36 +965,6 @@ packages:
     resolution: {integrity: sha512-47XIizs9XZXvuJgoaJUIE2lFoID8ugvc0jzSHP+Ptfk8nTbnR8g788wv48N03Kx0UkAv559HWRQ3yzOgzlRNUA==}
     engines: {node: '>= 18'}
 
-  '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
-    resolution: {integrity: sha512-QZHtlVgbAdy2zAqNA9Gu1UpIuI8Xvsd1v8ic6B2pZmeFnFcMWiPLfWXh7TVw4eGEZ/C9TH281KwhVoeQUKbyjw==}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@msgpackr-extract/msgpackr-extract-darwin-x64@3.0.3':
-    resolution: {integrity: sha512-mdzd3AVzYKuUmiWOQ8GNhl64/IoFGol569zNRdkLReh6LRLHOXxU4U8eq0JwaD8iFHdVGqSy4IjFL4reoWCDFw==}
-    cpu: [x64]
-    os: [darwin]
-
-  '@msgpackr-extract/msgpackr-extract-linux-arm64@3.0.3':
-    resolution: {integrity: sha512-YxQL+ax0XqBJDZiKimS2XQaf+2wDGVa1enVRGzEvLLVFeqa5kx2bWbtcSXgsxjQB7nRqqIGFIcLteF/sHeVtQg==}
-    cpu: [arm64]
-    os: [linux]
-
-  '@msgpackr-extract/msgpackr-extract-linux-arm@3.0.3':
-    resolution: {integrity: sha512-fg0uy/dG/nZEXfYilKoRe7yALaNmHoYeIoJuJ7KJ+YyU2bvY8vPv27f7UKhGRpY6euFYqEVhxCFZgAUNQBM3nw==}
-    cpu: [arm]
-    os: [linux]
-
-  '@msgpackr-extract/msgpackr-extract-linux-x64@3.0.3':
-    resolution: {integrity: sha512-cvwNfbP07pKUfq1uH+S6KJ7dT9K8WOE4ZiAcsrSes+UY55E/0jLYc+vq+DO7jlmqRb5zAggExKm0H7O/CBaesg==}
-    cpu: [x64]
-    os: [linux]
-
-  '@msgpackr-extract/msgpackr-extract-win32-x64@3.0.3':
-    resolution: {integrity: sha512-x0fWaQtYp4E6sktbsdAqnehxDgEc/VwM7uLsRCYWaiGu0ykYdZPiS8zCWdnjHwyiumousxfBm4SO31eXqwEZhQ==}
-    cpu: [x64]
-    os: [win32]
-
   '@mui/core-downloads-tracker@7.3.9':
     resolution: {integrity: sha512-MOkOCTfbMJwLshlBCKJ59V2F/uaLYfmKnN76kksj6jlGUVdI25A9Hzs08m+zjBRdLv+sK7Rqdsefe8X7h/6PCw==}
 
@@ -1214,14 +1150,6 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
-
-  '@opentelemetry/api@1.9.0':
-    resolution: {integrity: sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==}
-    engines: {node: '>=8.0.0'}
-
-  '@opentelemetry/semantic-conventions@1.40.0':
-    resolution: {integrity: sha512-cifvXDhcqMwwTlTK04GBNeIe7yyo28Mfby85QXFe1Yk8nmi36Ab/5UQwptOx84SsoGNRg+EVSjwzfSZMy6pmlw==}
-    engines: {node: '>=14'}
 
   '@paulmillr/qr@0.2.1':
     resolution: {integrity: sha512-IHnV6A+zxU7XwmKFinmYjUcwlyK9+xkG3/s9KcQhI9BjQKycrJ1JRO+FbNYPwZiPKW3je/DR0k7w8/gLa5eaxQ==}
@@ -3504,9 +3432,6 @@ packages:
     resolution: {integrity: sha512-aAWcW57uxVNrQZqFXjITpW3sIUQmHGG3qSb9mUah9MgMC4NeWhNOlNjXEYq3HjRAvL6arUviZGGJsBg6z0zsWA==}
     engines: {node: '>= 0.8'}
 
-  find-my-way-ts@0.1.6:
-    resolution: {integrity: sha512-a85L9ZoXtNAey3Y6Z+eBWW658kO/MwR7zIafkIUPUMf3isZG0NCs2pjW2wtjxAKuJPxMAsHUIP4ZPGv0o5gyTA==}
-
   find-root@1.1.0:
     resolution: {integrity: sha512-NKfW6bec6GfKc0SGx1e07QZY9PE99u0Bft/0rzSD5k3sO/vwkVUpDUKVm5Gpp5Ue3YfShPFTX2070tDs5kB9Ng==}
 
@@ -4276,18 +4201,8 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  msgpackr-extract@3.0.3:
-    resolution: {integrity: sha512-P0efT1C9jIdVRefqjzOQ9Xml57zpOXnIuS+csaB4MdZbTdmGDLo8XhzBG1N7aO11gKDDkJvBLULeFTo46wwreA==}
-    hasBin: true
-
-  msgpackr@1.11.9:
-    resolution: {integrity: sha512-FkoAAyyA6HM8wL882EcEyFZ9s7hVADSwG9xrVx3dxxNQAtgADTrJoEWivID82Iv1zWDsv/OtbrrcZAzGzOMdNw==}
-
   multiformats@9.9.0:
     resolution: {integrity: sha512-HoMUjhH9T8DDBNT+6xzkrd9ga/XiBI4xLr58LJACwK6G3HTOPeMz4nB4KJs33L2BelrIJa7P0VuNaVF3hMYfjg==}
-
-  multipasta@0.2.7:
-    resolution: {integrity: sha512-KPA58d68KgGil15oDqXjkUBEBYc00XvbPj5/X+dyzeo/lWm9Nc25pQRlf1D+gv4OpK7NM0J1odrbu9JNNGvynA==}
 
   mz@2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
@@ -4325,10 +4240,6 @@ packages:
 
   node-gyp-build-optional-packages@5.1.1:
     resolution: {integrity: sha512-+P72GAjVAbTxjjwUmwjVrqrdZROD4nf8KgpBoDxqXXTiYZZt/ud60dE5yvCSr9lRO8e8yv6kgJIC0K0PfZFVQw==}
-    hasBin: true
-
-  node-gyp-build-optional-packages@5.2.2:
-    resolution: {integrity: sha512-s+w+rBWnpTMwSFbaE0UXsRlg7hU4FjekKU4eyAih5T8nJuNZT1nNsskXpxmeqSK9UzkBl6UgRlnKc8hz8IEqOw==}
     hasBin: true
 
   node-gyp-build@4.8.4:
@@ -6079,9 +5990,9 @@ snapshots:
 
   '@cartridge/account-wasm@0.7.13': {}
 
-  '@cartridge/connector@0.10.7(@starknet-react/core@5.0.3(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(@types/react@18.3.28)(bufferutil@4.1.0)(immer@10.2.0)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)':
+  '@cartridge/connector@0.10.5(@starknet-react/core@5.0.3(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(utf-8-validate@6.0.6))(@types/react@18.3.28)(bufferutil@4.1.0)(immer@10.2.0)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)':
     dependencies:
-      '@cartridge/controller': 0.10.7(@types/react@18.3.28)(bufferutil@4.1.0)(immer@10.2.0)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)
+      '@cartridge/controller': 0.10.5(@types/react@18.3.28)(bufferutil@4.1.0)(immer@10.2.0)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)
       '@starknet-react/core': 5.0.3(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(utf-8-validate@6.0.6)
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -6117,7 +6028,7 @@ snapshots:
 
   '@cartridge/controller-wasm@0.3.19': {}
 
-  '@cartridge/controller@0.10.7(@types/react@18.3.28)(bufferutil@4.1.0)(immer@10.2.0)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)':
+  '@cartridge/controller@0.10.5(@types/react@18.3.28)(bufferutil@4.1.0)(immer@10.2.0)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)':
     dependencies:
       '@cartridge/controller-wasm': 0.3.19
       '@cartridge/penpal': 6.2.4
@@ -6337,7 +6248,7 @@ snapshots:
       - utf-8-validate
     optional: true
 
-  '@dojoengine/core@1.8.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
+  '@dojoengine/core@1.8.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)':
     dependencies:
       '@dojoengine/recs': 2.0.13(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@3.25.76)
       starknet: 8.5.2
@@ -6347,11 +6258,9 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@dojoengine/grpc@1.8.7(@effect/platform@0.93.8(effect@3.19.19))(@opentelemetry/semantic-conventions@1.40.0)':
+  '@dojoengine/grpc@1.8.0':
     dependencies:
-      '@effect/opentelemetry': 0.59.3(@effect/platform@0.93.8(effect@3.19.19))(@opentelemetry/api@1.9.0)(@opentelemetry/semantic-conventions@1.40.0)(effect@3.19.19)
       '@grpc/grpc-js': 1.14.3
-      '@opentelemetry/api': 1.9.0
       '@protobuf-ts/grpcweb-transport': 2.11.1
       '@protobuf-ts/plugin': 2.11.1
       '@protobuf-ts/runtime': 2.11.1
@@ -6359,16 +6268,7 @@ snapshots:
       effect: 3.19.19
       google-protobuf: 3.21.4
       grpc-web: 1.5.0
-      starknet: 8.5.2
     transitivePeerDependencies:
-      - '@effect/platform'
-      - '@opentelemetry/resources'
-      - '@opentelemetry/sdk-logs'
-      - '@opentelemetry/sdk-metrics'
-      - '@opentelemetry/sdk-trace-base'
-      - '@opentelemetry/sdk-trace-node'
-      - '@opentelemetry/sdk-trace-web'
-      - '@opentelemetry/semantic-conventions'
       - supports-color
 
   '@dojoengine/recs@2.0.13(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@3.25.76)':
@@ -6383,14 +6283,14 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@dojoengine/sdk@1.9.0(@effect/platform@0.93.8(effect@3.19.19))(@opentelemetry/semantic-conventions@1.40.0)(@tanstack/react-query@5.90.21(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)':
+  '@dojoengine/sdk@1.8.0(@tanstack/react-query@5.90.21(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)':
     dependencies:
-      '@dojoengine/core': 1.8.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@dojoengine/grpc': 1.8.7(@effect/platform@0.93.8(effect@3.19.19))(@opentelemetry/semantic-conventions@1.40.0)
-      '@dojoengine/state': 1.8.5(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)
-      '@dojoengine/torii-client': 1.8.2
-      '@dojoengine/torii-wasm': 1.8.2
-      '@dojoengine/utils': 1.8.4(bufferutil@4.1.0)(starknet@8.5.2)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@3.25.76)
+      '@dojoengine/core': 1.8.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@dojoengine/grpc': 1.8.0
+      '@dojoengine/state': 1.8.0(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)
+      '@dojoengine/torii-client': 1.8.0
+      '@dojoengine/torii-wasm': 1.8.0
+      '@dojoengine/utils': 1.8.0(bufferutil@4.1.0)(starknet@8.5.2)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@3.25.76)
       '@starknet-react/chains': 5.0.1
       '@starknet-react/core': 5.0.3(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(utf-8-validate@6.0.6)
       '@tanstack/react-query': 5.90.21(react@18.3.1)
@@ -6404,14 +6304,6 @@ snapshots:
       starknet: 8.5.2
       zustand: 4.5.7(@types/react@18.3.28)(immer@10.2.0)(react@18.3.1)
     transitivePeerDependencies:
-      - '@effect/platform'
-      - '@opentelemetry/resources'
-      - '@opentelemetry/sdk-logs'
-      - '@opentelemetry/sdk-metrics'
-      - '@opentelemetry/sdk-trace-base'
-      - '@opentelemetry/sdk-trace-node'
-      - '@opentelemetry/sdk-trace-web'
-      - '@opentelemetry/semantic-conventions'
       - bufferutil
       - get-starknet-core
       - supports-color
@@ -6420,10 +6312,10 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@dojoengine/state@1.8.5(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)':
+  '@dojoengine/state@1.8.0(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)':
     dependencies:
       '@dojoengine/recs': 2.0.13(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@3.25.76)
-      '@dojoengine/torii-client': 1.8.2
+      '@dojoengine/torii-client': 1.8.0
       immer: 10.2.0
       starknet: 8.5.2
       zustand: 5.0.11(@types/react@18.3.28)(immer@10.2.0)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
@@ -6436,13 +6328,13 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@dojoengine/torii-client@1.8.2':
+  '@dojoengine/torii-client@1.8.0':
     dependencies:
-      '@dojoengine/torii-wasm': 1.8.2
+      '@dojoengine/torii-wasm': 1.8.0
 
-  '@dojoengine/torii-wasm@1.8.2': {}
+  '@dojoengine/torii-wasm@1.8.0': {}
 
-  '@dojoengine/utils@1.8.4(bufferutil@4.1.0)(starknet@8.5.2)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@3.25.76)':
+  '@dojoengine/utils@1.8.0(bufferutil@4.1.0)(starknet@8.5.2)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@3.25.76)':
     dependencies:
       '@dojoengine/recs': 2.0.13(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@3.25.76)
       '@latticexyz/utils': 2.2.23
@@ -6458,21 +6350,6 @@ snapshots:
   '@ecies/ciphers@0.2.5(@noble/ciphers@1.3.0)':
     dependencies:
       '@noble/ciphers': 1.3.0
-
-  '@effect/opentelemetry@0.59.3(@effect/platform@0.93.8(effect@3.19.19))(@opentelemetry/api@1.9.0)(@opentelemetry/semantic-conventions@1.40.0)(effect@3.19.19)':
-    dependencies:
-      '@effect/platform': 0.93.8(effect@3.19.19)
-      '@opentelemetry/semantic-conventions': 1.40.0
-      effect: 3.19.19
-    optionalDependencies:
-      '@opentelemetry/api': 1.9.0
-
-  '@effect/platform@0.93.8(effect@3.19.19)':
-    dependencies:
-      effect: 3.19.19
-      find-my-way-ts: 0.1.6
-      msgpackr: 1.11.9
-      multipasta: 0.2.7
 
   '@emotion/babel-plugin@11.13.5':
     dependencies:
@@ -7003,24 +6880,6 @@ snapshots:
 
   '@msgpack/msgpack@3.1.3': {}
 
-  '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
-    optional: true
-
-  '@msgpackr-extract/msgpackr-extract-darwin-x64@3.0.3':
-    optional: true
-
-  '@msgpackr-extract/msgpackr-extract-linux-arm64@3.0.3':
-    optional: true
-
-  '@msgpackr-extract/msgpackr-extract-linux-arm@3.0.3':
-    optional: true
-
-  '@msgpackr-extract/msgpackr-extract-linux-x64@3.0.3':
-    optional: true
-
-  '@msgpackr-extract/msgpackr-extract-win32-x64@3.0.3':
-    optional: true
-
   '@mui/core-downloads-tracker@7.3.9': {}
 
   '@mui/icons-material@7.3.9(@mui/material@7.3.9(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react@18.3.1))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.28)(react@18.3.1)':
@@ -7185,10 +7044,6 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
-
-  '@opentelemetry/api@1.9.0': {}
-
-  '@opentelemetry/semantic-conventions@1.40.0': {}
 
   '@paulmillr/qr@0.2.1': {}
 
@@ -10388,8 +10243,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  find-my-way-ts@0.1.6: {}
-
   find-root@1.1.0: {}
 
   find-up@4.1.0:
@@ -11045,9 +10898,9 @@ snapshots:
 
   merge2@1.4.1: {}
 
-  metagame-sdk@0.1.22(@dojoengine/sdk@1.9.0(@effect/platform@0.93.8(effect@3.19.19))(@opentelemetry/semantic-conventions@1.40.0)(@tanstack/react-query@5.90.21(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76))(typescript@5.9.3)(zustand@4.5.7(@types/react@18.3.28)(immer@10.2.0)(react@18.3.1)):
+  metagame-sdk@0.1.22(@dojoengine/sdk@1.8.0(@tanstack/react-query@5.90.21(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76))(typescript@5.9.3)(zustand@4.5.7(@types/react@18.3.28)(immer@10.2.0)(react@18.3.1)):
     dependencies:
-      '@dojoengine/sdk': 1.9.0(@effect/platform@0.93.8(effect@3.19.19))(@opentelemetry/semantic-conventions@1.40.0)(@tanstack/react-query@5.90.21(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)
+      '@dojoengine/sdk': 1.8.0(@tanstack/react-query@5.90.21(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(bufferutil@4.1.0)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.5.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(utf-8-validate@6.0.6)(zod@3.25.76)
       typescript: 5.9.3
       zustand: 4.5.7(@types/react@18.3.28)(immer@10.2.0)(react@18.3.1)
 
@@ -11292,25 +11145,7 @@ snapshots:
 
   ms@2.1.3: {}
 
-  msgpackr-extract@3.0.3:
-    dependencies:
-      node-gyp-build-optional-packages: 5.2.2
-    optionalDependencies:
-      '@msgpackr-extract/msgpackr-extract-darwin-arm64': 3.0.3
-      '@msgpackr-extract/msgpackr-extract-darwin-x64': 3.0.3
-      '@msgpackr-extract/msgpackr-extract-linux-arm': 3.0.3
-      '@msgpackr-extract/msgpackr-extract-linux-arm64': 3.0.3
-      '@msgpackr-extract/msgpackr-extract-linux-x64': 3.0.3
-      '@msgpackr-extract/msgpackr-extract-win32-x64': 3.0.3
-    optional: true
-
-  msgpackr@1.11.9:
-    optionalDependencies:
-      msgpackr-extract: 3.0.3
-
   multiformats@9.9.0: {}
-
-  multipasta@0.2.7: {}
 
   mz@2.7.0:
     dependencies:
@@ -11339,11 +11174,6 @@ snapshots:
       whatwg-url: 5.0.0
 
   node-gyp-build-optional-packages@5.1.1:
-    dependencies:
-      detect-libc: 2.1.2
-    optional: true
-
-  node-gyp-build-optional-packages@5.2.2:
     dependencies:
       detect-libc: 2.1.2
     optional: true

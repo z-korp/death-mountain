@@ -10,12 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@cartridge/connector": "^0.10.1",
-    "@cartridge/controller": "^0.10.1",
+    "@cartridge/connector": "0.10.5",
+    "@cartridge/controller": "0.10.5",
     "@cloudflare/stream-react": "^1.9.3",
-    "@dojoengine/core": "^1.7.6",
-    "@dojoengine/sdk": "^1.7.6",
-    "@dojoengine/utils": "^1.7.6",
+    "@dojoengine/core": "1.8.0",
+    "@dojoengine/sdk": "1.8.0",
+    "@dojoengine/utils": "1.8.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fontsource/roboto": "^5.2.5",
