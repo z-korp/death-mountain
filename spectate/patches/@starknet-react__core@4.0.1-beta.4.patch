@@ -1,0 +1,42 @@
+diff --git a/dist/index.js b/dist/index.js
+index 2f17ad01385573c7462fba668fc5421e01dd53dc..a5b5d0f13f574099d3e2c504bd8d340974122cf0 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1759,29 +1759,6 @@ function useConnect(props = {}) {
+   };
+ }
+ 
+-// src/hooks/use-contract-factory.ts
+-import { useMemo as useMemo5 } from "react";
+-import { ContractFactory } from "starknet";
+-function useContractFactory({
+-  compiledContract,
+-  classHash,
+-  abi: abi2
+-}) {
+-  const { account } = useAccount();
+-  const contractFactory = useMemo5(() => {
+-    if (compiledContract && account && classHash) {
+-      return new ContractFactory({
+-        compiledContract,
+-        classHash,
+-        account,
+-        abi: abi2
+-      });
+-    }
+-    return void 0;
+-  }, [compiledContract, classHash, account, abi2]);
+-  return { contractFactory };
+-}
+-
+ // src/hooks/use-declare-contract.ts
+ function useDeclareContract(props) {
+   const { params, ...rest } = props;
+@@ -3145,7 +3122,6 @@ export {
+   useCall,
+   useConnect,
+   useContract,
+-  useContractFactory,
+   useDeclareContract,
+   useDeployAccount,
+   useDisconnect,
