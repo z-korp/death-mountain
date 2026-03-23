@@ -3,7 +3,9 @@ import { useController } from "@/contexts/controller";
 import { useDynamicConnector } from "@/contexts/starknet";
 import { useDungeon } from "@/dojo/useDungeon";
 import { useSwapStore } from "@/stores/swapStore";
-import { executeSwapAndMint, estimateGamesForDeposit } from "@/utils/swapAndMint";
+import { STRK_RESERVE_USDC, estimateSwapPreview, executeSwapAndMint } from "@/utils/swapAndMint";
+import { executeProxySwapAndMint } from "@/utils/proxySwap";
+import { stringToFelt } from "@/utils/utils";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Button, CircularProgress, IconButton, Typography } from "@mui/material";
 import { useAccount, useProvider } from "@starknet-react/core";
@@ -12,21 +14,22 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Contract } from "starknet";
 
 /**
- * Confirmation modal shown when STRK deposit is detected.
- * Displays how much STRK arrived and estimated games, lets user
+ * Confirmation modal shown when a supported deposit is detected.
+ * Displays how much token arrived and estimated games, lets user
  * confirm the swap or dismiss.
  *
  * Style: centered card, Loot Survivor design (dark green, gold accents).
  */
 export default function SwapConfirmationModal() {
-  const { stage, depositAmount, walletAddress, isSwapping, reset } = useSwapStore();
-  const { purchaseGames } = useController();
+  const { stage, depositAmount, depositTokenSymbol, walletAddress, isSwapping, reset } = useSwapStore();
+  const { purchaseGames, account: controllerAccount, playerName } = useController();
   const { provider } = useProvider();
-  const { address: accountAddress } = useAccount();
+  const { account: walletAccount, address: accountAddress } = useAccount();
   const { currentNetworkConfig } = useDynamicConnector();
   const dungeon = useDungeon();
 
   const [estimatedGames, setEstimatedGames] = useState<number | null>(null);
+  const [reserveEnabled, setReserveEnabled] = useState(false);
   const [quoteLoading, setQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
 
@@ -40,6 +43,11 @@ export default function SwapConfirmationModal() {
           })
         : null,
     [provider, currentNetworkConfig.ekuboRouter]
+  );
+
+  const depositToken = useMemo(
+    () => currentNetworkConfig.paymentTokens.find((t: any) => t.name === (depositTokenSymbol || "STRK")),
+    [currentNetworkConfig.paymentTokens, depositTokenSymbol]
   );
 
   const strkToken = useMemo(
@@ -57,17 +65,25 @@ export default function SwapConfirmationModal() {
 
   // Fetch estimated games when modal becomes visible
   useEffect(() => {
-    if (!show || !strkToken || !dungeon.ticketAddress || !depositAmount) return;
+    if (!show || !depositToken || !dungeon.ticketAddress || !depositAmount) return;
 
     let cancelled = false;
     setQuoteLoading(true);
     setQuoteError(null);
     setEstimatedGames(null);
+    setReserveEnabled(false);
 
-    estimateGamesForDeposit(depositAmount, strkToken.address, dungeon.ticketAddress)
-      .then((games) => {
+    estimateSwapPreview(
+      depositAmount,
+      depositToken.address,
+      dungeon.ticketAddress,
+      depositToken.decimals || 18,
+      depositToken.name === "USDC" ? STRK_RESERVE_USDC : 0
+    )
+      .then((preview) => {
         if (!cancelled) {
-          setEstimatedGames(games);
+          setEstimatedGames(preview.gamesToBuy);
+          setReserveEnabled(preview.reserveEnabled);
           setQuoteLoading(false);
         }
       })
@@ -82,19 +98,48 @@ export default function SwapConfirmationModal() {
     return () => {
       cancelled = true;
     };
-  }, [show, depositAmount, strkToken, dungeon.ticketAddress]);
+  }, [show, depositAmount, depositToken, dungeon.ticketAddress]);
+
+  const proxyAddress = currentNetworkConfig.gameProxy;
+  const execAccount = controllerAccount || walletAccount;
+  const useProxy = depositTokenSymbol === "USDC" && !!proxyAddress && !!execAccount;
 
   const handleConfirm = useCallback(() => {
-    if (!depositAmount || !strkToken || !dungeon.ticketAddress || !routerContract) return;
+    if (!depositAmount || !depositToken || !dungeon.ticketAddress) return;
 
+    // Use proxy for USDC deposits (Chainrails bridge flow)
+    if (useProxy && execAccount) {
+      executeProxySwapAndMint({
+        depositAmount,
+        usdcAddress: depositToken.address,
+        ticketAddress: dungeon.ticketAddress,
+        proxyAddress: proxyAddress!,
+        playerName: playerName || "Adventurer",
+        recipientAddress: execAccount.address,
+        account: execAccount,
+        onSuccess: (gamesMinted) => {
+          console.log("[SwapConfirmation] Proxy minted games:", gamesMinted);
+          useSwapStore.getState().complete(gamesMinted);
+        },
+      });
+      return;
+    }
+
+    // Fallback: direct Ekubo swap for non-USDC deposits
+    if (!routerContract) return;
     executeSwapAndMint({
       depositAmount,
-      strkTokenAddress: strkToken.address,
+      inputTokenAddress: depositToken.address,
+      inputTokenSymbol: depositToken.name || depositTokenSymbol || "STRK",
+      inputTokenDecimals: depositToken.decimals || 18,
       ticketAddress: dungeon.ticketAddress,
+      reserveTokenAddress: depositToken.name === "USDC" ? strkToken?.address : undefined,
+      reserveTokenSymbol: "STRK",
+      reserveInputAmount: depositToken.name === "USDC" ? STRK_RESERVE_USDC : 0,
       routerContract,
       purchaseGames,
     });
-  }, [depositAmount, strkToken, dungeon.ticketAddress, routerContract, purchaseGames]);
+  }, [depositAmount, depositToken, depositTokenSymbol, dungeon.ticketAddress, routerContract, purchaseGames, strkToken, useProxy, execAccount, proxyAddress, playerName]);
 
   const handleDismiss = useCallback(() => {
     reset();
@@ -119,7 +164,7 @@ export default function SwapConfirmationModal() {
 
               {/* Title */}
               <Box sx={styles.titleContainer}>
-                <Typography sx={styles.title}>STRK RECEIVED</Typography>
+                <Typography sx={styles.title}>{depositTokenSymbol || "STRK"} RECEIVED</Typography>
                 <Box sx={styles.titleUnderline} />
               </Box>
 
@@ -130,7 +175,7 @@ export default function SwapConfirmationModal() {
               {/* Deposit info */}
               <Box sx={styles.infoCard}>
                 <Typography sx={styles.depositAmount}>
-                  +{depositAmount.toLocaleString(undefined, { maximumFractionDigits: 1 })} STRK
+                  +{depositAmount.toLocaleString(undefined, { maximumFractionDigits: 4 })} {depositTokenSymbol || "STRK"}
                 </Typography>
 
                 {quoteLoading && (
@@ -143,9 +188,16 @@ export default function SwapConfirmationModal() {
                 )}
 
                 {!quoteLoading && estimatedGames !== null && estimatedGames > 0 && (
-                  <Typography sx={styles.estimateText}>
-                    Enough for ~{estimatedGames} game{estimatedGames > 1 ? "s" : ""}
-                  </Typography>
+                  <>
+                    <Typography sx={styles.estimateText}>
+                      Enough for ~{estimatedGames} game{estimatedGames > 1 ? "s" : ""}
+                    </Typography>
+                    {reserveEnabled && depositTokenSymbol === "USDC" && (
+                      <Typography sx={{ ...styles.estimateText, fontSize: 11 }}>
+                        Includes a ~$0.10 STRK reserve for future fees
+                      </Typography>
+                    )}
+                  </>
                 )}
 
                 {!quoteLoading && estimatedGames === 0 && (

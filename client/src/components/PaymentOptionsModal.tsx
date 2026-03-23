@@ -1,3 +1,4 @@
+import { PaymentModal, usePaymentSession } from "@chainrails/react";
 import ROUTER_ABI from "@/abi/router-abi.json";
 import { generateSwapCalls, getSwapQuote } from "@/api/ekubo";
 import { useController } from "@/contexts/controller";
@@ -10,6 +11,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 
 import TokenIcon from "@mui/icons-material/Token";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import {
   Box,
   Button,
@@ -819,6 +821,100 @@ const FiatTabContent = memo(({
 });
 FiatTabContent.displayName = "FiatTabContent";
 
+// Cross-chain tab — Chainrails modal flow (USDC on Starknet)
+const ChainrailsTabContent = memo(({
+  walletAddress,
+  strkPerGame,
+  isMinting,
+  onPaymentSuccess,
+}: {
+  walletAddress: string;
+  strkPerGame: number | null;
+  isMinting: boolean;
+  onPaymentSuccess: () => void;
+}) => {
+  const sessionUrl = useMemo(() => {
+    if (!walletAddress) return "";
+    return `/api/create-chainrails-session?recipient=${encodeURIComponent(walletAddress)}&amount=0`;
+  }, [walletAddress]);
+
+  const cr = usePaymentSession({
+    session_url: sessionUrl,
+    onSuccess: () => {
+      console.log("[Chainrails] Payment successful");
+      onPaymentSuccess();
+    },
+    onCancel: () => {
+      console.log("[Chainrails] Payment cancelled");
+    },
+  });
+
+  // Minting overlay
+  const mintingOverlay = isMinting && (
+    <Box sx={{
+      position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10,
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+      background: "rgba(15, 31, 15, 0.95)", borderRadius: 1,
+    }}>
+      <CircularProgress size={40} sx={{ color: "#d0c98d", mb: 2 }} />
+      <Typography sx={{ fontSize: 14, fontWeight: 600, mb: 1 }}>
+        Finishing your purchase...
+      </Typography>
+      <Typography sx={{ fontSize: 12, color: "rgba(255,255,255,0.6)" }}>
+        Confirm the transaction in your wallet
+      </Typography>
+    </Box>
+  );
+
+  return (
+    <Box sx={{ position: "relative", width: "100%" }}>
+      {mintingOverlay}
+
+      {/* Info banner */}
+      <Box sx={{
+        mx: 2, mt: 1.5, mb: 1, px: 2, py: 1.5,
+        background: "rgba(208, 201, 141, 0.08)",
+        border: "1px solid rgba(208, 201, 141, 0.2)",
+        borderRadius: 1, textAlign: "center",
+      }}>
+        {strkPerGame && (
+          <Typography sx={{ fontSize: 15, fontWeight: 700, color: "#d0c98d", letterSpacing: 0.5 }}>
+            1 game = {strkPerGame.toFixed(1)} STRK
+          </Typography>
+        )}
+        <Typography sx={{ fontSize: 11, color: "rgba(255,255,255,0.5)", mt: 0.5 }}>
+          Pay from any chain and receive USDC on Starknet. We guarantee at least 1 game and reserve ~$0.10 in STRK when possible.
+        </Typography>
+      </Box>
+
+      {/* Error message */}
+      {cr.error && (
+        <Box sx={{ mx: 2, mb: 1, px: 2, py: 1, background: "rgba(244, 67, 54, 0.1)", border: "1px solid rgba(244, 67, 54, 0.3)", borderRadius: 1 }}>
+          <Typography sx={{ fontSize: 12, color: "#f44336", textAlign: "center" }}>{cr.error}</Typography>
+        </Box>
+      )}
+
+      {/* Pay button */}
+      <Box sx={{ px: 3, py: 2 }}>
+        <Button
+          variant="contained"
+          sx={styles.activateButton}
+          onClick={cr.open}
+          fullWidth
+          disabled={cr.isPending || isMinting || !sessionUrl}
+        >
+          <Typography sx={styles.buttonText}>
+            {cr.isPending ? "Initializing..." : "Pay Cross-Chain"}
+          </Typography>
+        </Button>
+      </Box>
+
+      <PaymentModal {...cr} styles={{ accentColor: "#d0c98d", theme: "dark" }} excludeChains={["STARKNET" as any]} />
+    </Box>
+  );
+});
+ChainrailsTabContent.displayName = "ChainrailsTabContent";
+
 // --- Main Component ---
 
 export default function PaymentOptionsModal({
@@ -880,10 +976,14 @@ export default function PaymentOptionsModal({
     return Number(tokenBalances["STRK"] || 0);
   }, [tokenBalances]);
 
+  const usdcBalance = useMemo(() => {
+    return Number(tokenBalances["USDC"] || 0);
+  }, [tokenBalances]);
+
   // --- State ---
 
   const [specialView, setSpecialView] = useState<"golden" | "dungeon" | null>(null);
-  const [activeTab, setActiveTab] = useState<"crypto" | "fiat">("crypto");
+  const [activeTab, setActiveTab] = useState<"crypto" | "fiat" | "crosschain">("crypto");
   const [selectedToken, setSelectedToken] = useState("");
   const [isMinting, setIsMinting] = useState(false);
   const [tokenQuote, setTokenQuote] = useState<{
@@ -1064,7 +1164,7 @@ export default function PaymentOptionsModal({
 
   // Register on-ramp intent when fiat tab opens (persisted — survives page close)
   useEffect(() => {
-    if (!(activeTab === "fiat" && specialView === null && open && !isMinting && accountAddress)) {
+    if (!((activeTab === "fiat" || activeTab === "crosschain") && specialView === null && open && !isMinting && accountAddress)) {
       return;
     }
 
@@ -1077,14 +1177,19 @@ export default function PaymentOptionsModal({
 
     const registerOnrampIntent = async () => {
       let initialBalance = strkBalance;
+      let initialUsdc = usdcBalance;
       let source: "cached" | "refreshed" = "cached";
 
       try {
         const refreshedBalances = await refreshTokenBalances();
         const refreshedStrk = Number(refreshedBalances["STRK"] ?? NaN);
+        const refreshedUsdc = Number(refreshedBalances["USDC"] ?? NaN);
         if (Number.isFinite(refreshedStrk)) {
           initialBalance = refreshedStrk;
           source = "refreshed";
+        }
+        if (Number.isFinite(refreshedUsdc)) {
+          initialUsdc = refreshedUsdc;
         }
       } catch (error) {
         console.warn("[OnRamp] Failed to refresh STRK balance before intent registration", error);
@@ -1093,9 +1198,15 @@ export default function PaymentOptionsModal({
       const latestSwapState = useSwapStore.getState();
       if (latestSwapState.stage !== "idle") return;
 
-      latestSwapState.startOnramp(initialBalance, accountAddress);
+      latestSwapState.startOnramp(
+        initialBalance,
+        accountAddress,
+        activeTab === "crosschain" ? "chainrails" : "onramper",
+        initialUsdc
+      );
       console.log("[OnRamp] On-ramp intent registered:", {
         initialStrkBalance: initialBalance,
+        initialUsdcBalance: initialUsdc,
         source,
       });
     };
@@ -1103,7 +1214,7 @@ export default function PaymentOptionsModal({
     registerOnrampIntent().finally(() => {
       registeringOnrampIntent.current = false;
     });
-  }, [activeTab, specialView, open, isMinting, accountAddress, strkBalance, refreshTokenBalances]);
+  }, [activeTab, specialView, open, isMinting, accountAddress, strkBalance, usdcBalance, refreshTokenBalances]);
 
   // Show checkout overlay after returning from the provider tab.
   // This keeps users informed while we keep tracking in the background.
@@ -1347,7 +1458,17 @@ export default function PaymentOptionsModal({
                               "&.Mui-selected": { color: "#d0c98d" },
                             }}
                           />
-                        </Tabs>
+                      <Tab
+                        value="crosschain"
+                        label="Cross-chain"
+                        icon={<SwapHorizIcon sx={{ fontSize: 18 }} />}
+                        iconPosition="start"
+                        sx={{
+                          minHeight: 40, fontSize: 13, fontWeight: 600,
+                          color: activeTab === "crosschain" ? "#d0c98d" : "rgba(255,255,255,0.6)",
+                          "&.Mui-selected": { color: "#d0c98d" },
+                        }}
+                      />                        </Tabs>
                       </Box>
 
                       {/* Tab Content */}
@@ -1373,7 +1494,19 @@ export default function PaymentOptionsModal({
                           strkQuoteForGames={strkQuoteForGames}
                         />
                       )}
-                    </motion.div>
+                      {activeTab === "crosschain" && (
+                        <ChainrailsTabContent
+                          walletAddress={accountAddress}
+                          strkPerGame={strkQuoteForGames && minFiatGames > 0 ? strkQuoteForGames / minFiatGames : null}
+                          isMinting={isMinting}
+                          onPaymentSuccess={() => {
+                            const swapState = useSwapStore.getState();
+                            if (swapState.stage === "idle") {
+                              swapState.startOnramp(strkBalance, accountAddress!, "chainrails", usdcBalance);
+                            }
+                          }}
+                        />
+                      )}                    </motion.div>
                   )}
                 </AnimatePresence>
               </Box>

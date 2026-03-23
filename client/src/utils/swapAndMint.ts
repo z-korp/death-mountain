@@ -1,26 +1,43 @@
 import { generateSwapCalls, getSwapQuote } from "@/api/ekubo";
 import { useSwapStore } from "@/stores/swapStore";
 
+const STRK_RESERVE_USDC = 0.10;
+
 interface SwapAndMintParams {
-  /** Amount of STRK deposited (human-readable, e.g. 1113.5) */
+  /** Amount of deposited input token (human-readable) */
   depositAmount: number;
-  /** STRK token address on the current network */
-  strkTokenAddress: string;
+  /** Input token address on the current network */
+  inputTokenAddress: string;
+  /** Input token symbol for logs/errors */
+  inputTokenSymbol?: string;
+  /** Input token decimals (defaults to 18) */
+  inputTokenDecimals?: number;
   /** Dungeon ticket token address */
   ticketAddress: string;
+  /** Optional reserve output token address (used for a small STRK buffer on cross-chain USDC flows) */
+  reserveTokenAddress?: string;
+  reserveTokenSymbol?: string;
+  reserveInputAmount?: number;
   /** Ekubo router contract instance (from starknet.js) */
   routerContract: { address: string; populate: (method: string, params: any[]) => any };
   /** purchaseGames from ControllerContext */
-  purchaseGames: (calls: any[], gameCount: number, onSuccess: () => void) => void;
+  purchaseGames: (calls: any[], gameCount: number, onSuccess: () => void, gasTokenAddress?: string) => void;
 }
 
 const WEI = 10n ** 18n;
 const MAX_GAMES_PER_BATCH = 50;
 
-function toBufferedWeiFromStrk(amount: number): bigint {
-  // Keep 4 decimals of STRK precision, then apply 98% buffer with integer math.
-  const scaled = BigInt(Math.max(0, Math.floor(amount * 10_000)));
-  return (scaled * 98n * WEI) / 1_000_000n;
+function toUnits(amount: number, decimals: number): bigint {
+  const safeDecimals = Math.max(0, decimals);
+  const precision = Math.min(safeDecimals, 6);
+  const multiplier = 10 ** precision;
+  const scaled = BigInt(Math.max(0, Math.floor(amount * multiplier)));
+  return scaled * 10n ** BigInt(safeDecimals - precision);
+}
+
+function toBufferedUnits(amount: number, decimals: number): bigint {
+  const units = toUnits(amount, decimals);
+  return (units * 98n) / 100n;
 }
 
 function toAbsoluteBigInt(value: unknown): bigint {
@@ -32,11 +49,93 @@ function toAbsoluteBigInt(value: unknown): bigint {
   }
 }
 
+interface TicketPurchasePlan {
+  gamesToBuy: number;
+  reverseQuote: any;
+  inputAmount: number;
+}
+
+interface SwapPreview {
+  gamesToBuy: number;
+  reserveEnabled: boolean;
+}
+
+async function planTicketPurchase(
+  inputAmount: number,
+  inputTokenAddress: string,
+  ticketAddress: string,
+  inputTokenDecimals: number
+): Promise<TicketPurchasePlan> {
+  const depositUnits = toBufferedUnits(inputAmount, inputTokenDecimals);
+
+  if (depositUnits <= 0n) {
+    return { gamesToBuy: 0, reverseQuote: null, inputAmount };
+  }
+
+  const forwardQuote = await getSwapQuote(depositUnits, inputTokenAddress, ticketAddress);
+  const quotedGames = Number(toAbsoluteBigInt(forwardQuote?.total) / WEI);
+  let gamesToBuy = Math.min(MAX_GAMES_PER_BATCH, quotedGames);
+
+  if (gamesToBuy < 1) {
+    return { gamesToBuy: 0, reverseQuote: null, inputAmount };
+  }
+
+  const freshQuote = await getSwapQuote(depositUnits, inputTokenAddress, ticketAddress);
+  const freshGames = Number(toAbsoluteBigInt(freshQuote?.total) / WEI);
+
+  if (freshGames < gamesToBuy) {
+    gamesToBuy = freshGames;
+  }
+
+  if (gamesToBuy > 1) {
+    gamesToBuy -= 1;
+  }
+
+  if (gamesToBuy < 1) {
+    return { gamesToBuy: 0, reverseQuote: null, inputAmount };
+  }
+
+  const reverseAmount = -(BigInt(gamesToBuy) * WEI);
+  const reverseQuote = await getSwapQuote(reverseAmount, ticketAddress, inputTokenAddress);
+
+  return { gamesToBuy, reverseQuote, inputAmount };
+}
+
+async function buildSwapPreview(
+  depositAmount: number,
+  inputTokenAddress: string,
+  ticketAddress: string,
+  inputTokenDecimals: number,
+  reserveInputAmount = 0
+): Promise<SwapPreview> {
+  if (reserveInputAmount > 0 && depositAmount > reserveInputAmount) {
+    const reservedPlan = await planTicketPurchase(
+      depositAmount - reserveInputAmount,
+      inputTokenAddress,
+      ticketAddress,
+      inputTokenDecimals
+    );
+
+    if (reservedPlan.gamesToBuy >= 1) {
+      return { gamesToBuy: reservedPlan.gamesToBuy, reserveEnabled: true };
+    }
+  }
+
+  const fullPlan = await planTicketPurchase(
+    depositAmount,
+    inputTokenAddress,
+    ticketAddress,
+    inputTokenDecimals
+  );
+
+  return { gamesToBuy: fullPlan.gamesToBuy, reserveEnabled: false };
+}
+
 /**
  * Standalone swap+mint function.
  *
- * 1. Forward quote: how many tickets can `depositAmount` STRK buy?
- * 2. Reverse quote: exact STRK cost for that many tickets
+ * 1. Forward quote: how many tickets can `depositAmount` input token buy?
+ * 2. Reverse quote: exact input token cost for that many tickets
  * 3. Generate swap calls via Ekubo router
  * 4. Execute purchaseGames (swap + mint in one multicall)
  *
@@ -44,8 +143,13 @@ function toAbsoluteBigInt(value: unknown): bigint {
  */
 export async function executeSwapAndMint({
   depositAmount,
-  strkTokenAddress,
+  inputTokenAddress,
+  inputTokenSymbol = "STRK",
+  inputTokenDecimals = 18,
   ticketAddress,
+  reserveTokenAddress,
+  reserveTokenSymbol = "STRK",
+  reserveInputAmount = 0,
   routerContract,
   purchaseGames,
 }: SwapAndMintParams): Promise<void> {
@@ -61,78 +165,92 @@ export async function executeSwapAndMint({
 
   console.log("[SwapAndMint] Starting swap+mint", {
     depositAmount,
-    strkTokenAddress: strkTokenAddress.slice(0, 10) + "...",
+    inputTokenSymbol,
+    inputTokenAddress: inputTokenAddress.slice(0, 10) + "...",
     ticketAddress: ticketAddress.slice(0, 10) + "...",
+    reserveTokenAddress: reserveTokenAddress ? reserveTokenAddress.slice(0, 10) + "..." : null,
+    reserveInputAmount,
   });
 
   try {
     if (depositAmount <= 0) {
-      throw new Error("No STRK available for swap");
+      throw new Error(`No ${inputTokenSymbol} available for swap`);
     }
 
-    // Use 98% of deposit to leave a small buffer for fees
-    const depositWei = toBufferedWeiFromStrk(depositAmount);
-
-    if (depositWei <= 0n) {
-      throw new Error("No STRK available for swap");
-    }
-
-    console.log("[SwapAndMint] Getting forward quote...", { depositWei: depositWei.toString() });
-
-    const forwardQuote = await getSwapQuote(
-      depositWei,
-      strkTokenAddress,
-      ticketAddress
+    const preview = await buildSwapPreview(
+      depositAmount,
+      inputTokenAddress,
+      ticketAddress,
+      inputTokenDecimals,
+      reserveTokenAddress && reserveInputAmount > 0 ? reserveInputAmount : 0
     );
 
-    const quotedGames = Number(toAbsoluteBigInt(forwardQuote?.total) / WEI);
-    let gamesToBuy = Math.min(MAX_GAMES_PER_BATCH, quotedGames);
+    const reserveEnabled = preview.reserveEnabled;
+    const ticketInputAmount = reserveEnabled ? depositAmount - reserveInputAmount : depositAmount;
 
-    console.log("[SwapAndMint] Forward quote result:", {
-      quotedGames,
+    const ticketPlan = await planTicketPurchase(
+      ticketInputAmount,
+      inputTokenAddress,
+      ticketAddress,
+      inputTokenDecimals
+    );
+
+    const gamesToBuy = ticketPlan.gamesToBuy;
+
+    console.log("[SwapAndMint] Ticket purchase plan:", {
+      reserveEnabled,
+      ticketInputAmount,
+      reserveInputAmount: reserveEnabled ? reserveInputAmount : 0,
       gamesToBuy,
-      maxPerBatch: MAX_GAMES_PER_BATCH,
     });
 
-    if (gamesToBuy < 1) {
-      throw new Error("Not enough STRK to purchase even 1 game. Try with a larger amount.");
+    if (gamesToBuy < 1 || !ticketPlan.reverseQuote) {
+      throw new Error(`Not enough ${inputTokenSymbol} to purchase even 1 game. Try with a larger amount.`);
     }
-
-    // Re-quote to capture the latest price right before execution
-    const freshQuote = await getSwapQuote(depositWei, strkTokenAddress, ticketAddress);
-    const freshGames = Number(toAbsoluteBigInt(freshQuote?.total) / WEI);
-
-    if (freshGames < gamesToBuy) {
-      console.warn("[SwapAndMint] Slippage detected: quote dropped from", gamesToBuy, "to", freshGames);
-      gamesToBuy = freshGames;
-    }
-
-    // Safety margin: buy 1 less game to absorb residual slippage between quote and on-chain execution
-    if (gamesToBuy > 1) {
-      gamesToBuy -= 1;
-      console.log("[SwapAndMint] Applied safety margin, buying", gamesToBuy, "games");
-    }
-
-    if (gamesToBuy < 1) {
-      throw new Error("Not enough STRK to purchase even 1 game. Try with a larger amount.");
-    }
-
-    console.log("[SwapAndMint] Getting reverse quote for", gamesToBuy, "games...");
-    const reverseAmount = -(BigInt(gamesToBuy) * WEI);
-    const quote = await getSwapQuote(
-      reverseAmount,
-      ticketAddress,
-      strkTokenAddress
-    );
 
     store.setStage("swapping");
 
-    const tokenSwapData = {
+    const ticketSwapData = {
       tokenAddress: ticketAddress,
       minimumAmount: gamesToBuy,
-      quote,
+      quote: ticketPlan.reverseQuote,
     };
-    const calls = generateSwapCalls(routerContract, strkTokenAddress, tokenSwapData);
+    const calls: any[] = [];
+
+    if (reserveEnabled && reserveTokenAddress) {
+      const reserveInputUnits = toUnits(reserveInputAmount, inputTokenDecimals);
+      const reserveForwardQuote = await getSwapQuote(
+        reserveInputUnits,
+        inputTokenAddress,
+        reserveTokenAddress
+      );
+      const reserveOutputUnits = toAbsoluteBigInt(reserveForwardQuote?.total);
+      const reserveTargetOutput = (reserveOutputUnits * 98n) / 100n;
+
+      if (reserveTargetOutput > 0n) {
+        const reserveReverseQuote = await getSwapQuote(
+          -reserveTargetOutput,
+          reserveTokenAddress,
+          inputTokenAddress
+        );
+
+        calls.push(
+          ...generateSwapCalls(routerContract, inputTokenAddress, {
+            tokenAddress: reserveTokenAddress,
+            minimumAmount: 0,
+            quote: reserveReverseQuote,
+          })
+        );
+
+        console.log("[SwapAndMint] STRK reserve enabled", {
+          reserveInputAmount,
+          reserveTokenSymbol,
+          reserveTargetOutput: reserveTargetOutput.toString(),
+        });
+      }
+    }
+
+    calls.push(...generateSwapCalls(routerContract, inputTokenAddress, ticketSwapData));
 
     store.setStage("minting");
     purchaseGames(calls, gamesToBuy, () => {
@@ -148,18 +266,41 @@ export async function executeSwapAndMint({
 }
 
 /**
- * Get the estimated number of games for a given STRK deposit amount.
+ * Get the estimated number of games for a given deposited token amount.
  * Used by SwapConfirmationModal to show the user how many games they'll get.
  */
 export async function estimateGamesForDeposit(
   depositAmount: number,
-  strkTokenAddress: string,
-  ticketAddress: string
+  inputTokenAddress: string,
+  ticketAddress: string,
+  inputTokenDecimals = 18,
+  reserveInputAmount = 0
 ): Promise<number> {
-  const depositWei = toBufferedWeiFromStrk(depositAmount);
-  if (depositWei <= 0n) return 0;
+  const preview = await buildSwapPreview(
+    depositAmount,
+    inputTokenAddress,
+    ticketAddress,
+    inputTokenDecimals,
+    reserveInputAmount
+  );
 
-  const forwardQuote = await getSwapQuote(depositWei, strkTokenAddress, ticketAddress);
-  const quotedGames = Number(toAbsoluteBigInt(forwardQuote?.total) / WEI);
-  return Math.min(MAX_GAMES_PER_BATCH, quotedGames);
+  return preview.gamesToBuy;
 }
+
+export async function estimateSwapPreview(
+  depositAmount: number,
+  inputTokenAddress: string,
+  ticketAddress: string,
+  inputTokenDecimals = 18,
+  reserveInputAmount = 0
+): Promise<SwapPreview> {
+  return buildSwapPreview(
+    depositAmount,
+    inputTokenAddress,
+    ticketAddress,
+    inputTokenDecimals,
+    reserveInputAmount
+  );
+}
+
+export { STRK_RESERVE_USDC };

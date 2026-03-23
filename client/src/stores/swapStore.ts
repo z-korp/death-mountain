@@ -3,62 +3,47 @@ import { persist } from "zustand/middleware";
 
 export type SwapStage =
   | "idle"
-  | "waiting_deposit"  // Waiting for STRK to arrive from Onramper
-  | "deposit_detected" // STRK deposit detected — waiting for user confirmation
+  | "waiting_deposit"  // Waiting for funded token to arrive
+  | "deposit_detected" // Deposit detected
   | "quoting"          // Fetching swap quote from Ekubo
-  | "swapping"         // Executing STRK -> TICKET swap on-chain
-  | "minting"          // Minting game tokens from tickets
-  | "done"             // All complete — games are ready
+  | "swapping"         // Executing token -> TICKET swap
+  | "minting"          // Minting game tokens
+  | "done"             // All complete
   | "error";           // Something failed
 
-/** Onramper transaction statuses from webhooks/postMessage */
 export type OnrampStatus =
-  | "idle"              // No on-ramp activity yet
-  | "new"               // Transaction created, no payment yet
-  | "pending"           // Transaction in progress, awaiting action
-  | "paid"              // Payment made, crypto not yet delivered
-  | "completed"         // Transaction complete, crypto delivered
-  | "canceled"          // Canceled by user or system
-  | "failed";           // Transaction failed
+  | "idle" | "new" | "pending" | "paid" | "completed" | "canceled" | "failed";
+
+/** Which provider initiated the deposit flow */
+export type DepositSource = "onramper" | "chainrails";
+export type DepositTokenSymbol = "STRK" | "USDC";
 
 interface SwapState {
   stage: SwapStage;
   gamesMinted: number;
   errorMessage: string | null;
-  /** Timestamp (ms) when the current flow started */
   startedAt: number | null;
-  /** Whether the "games ready" popup has been dismissed */
   popupDismissed: boolean;
-
-  /** Onramper-specific transaction tracking */
   onrampStatus: OnrampStatus;
   onrampTransactionId: string | null;
   onrampProvider: string | null;
   onrampPaymentMethod: string | null;
-
-  /** Persisted on-ramp intent — survives page close */
   initialStrkBalance: number | null;
+  initialUsdcBalance: number | null;
   walletAddress: string | null;
-
-  /** Amount of STRK deposited (detected by watcher) */
   depositAmount: number | null;
-
-  /** Guard: true while the swap+mint tx is being executed */
+  depositTokenSymbol: DepositTokenSymbol | null;
   isSwapping: boolean;
+  depositSource: DepositSource | null;
 
-  // Actions
-  /** Register the on-ramp intent (called when fiat tab opens) */
-  startOnramp: (initialBalance: number, wallet: string) => void;
-  /** Called by watcher when STRK deposit is detected */
-  depositDetected: (amount: number) => void;
+  startOnramp: (initialStrkBalance: number, wallet: string, source?: DepositSource, initialUsdcBalance?: number) => void;
+  depositDetected: (amount: number, tokenSymbol?: DepositTokenSymbol) => void;
   setStage: (stage: SwapStage) => void;
   setError: (message: string) => void;
   complete: (gamesMinted: number) => void;
   dismissPopup: () => void;
   reset: () => void;
   setIsSwapping: (v: boolean) => void;
-
-  // Onramp-specific actions
   setOnrampStatus: (status: OnrampStatus) => void;
   setOnrampTransaction: (data: {
     transactionId?: string;
@@ -68,6 +53,7 @@ interface SwapState {
   }) => void;
   resetOnramp: () => void;
 }
+
 
 const INITIAL_STATE = {
   stage: "idle" as SwapStage,
@@ -80,9 +66,12 @@ const INITIAL_STATE = {
   onrampProvider: null,
   onrampPaymentMethod: null,
   initialStrkBalance: null,
+  initialUsdcBalance: null,
   walletAddress: null,
   depositAmount: null,
+  depositTokenSymbol: null,
   isSwapping: false,
+  depositSource: null,
 };
 
 export const useSwapStore = create<SwapState>()(
@@ -90,28 +79,28 @@ export const useSwapStore = create<SwapState>()(
     (set) => ({
       ...INITIAL_STATE,
 
-      startOnramp: (initialBalance, wallet) =>
+      startOnramp: (initialStrkBalance, wallet, source, initialUsdcBalance = 0) =>
         set({
           stage: "waiting_deposit",
           gamesMinted: 0,
           errorMessage: null,
           startedAt: Date.now(),
           popupDismissed: false,
-          initialStrkBalance: initialBalance,
+          initialStrkBalance,
+          initialUsdcBalance,
           walletAddress: wallet,
           depositAmount: null,
+          depositTokenSymbol: null,
           isSwapping: false,
           onrampStatus: "idle",
           onrampTransactionId: null,
           onrampProvider: null,
           onrampPaymentMethod: null,
+          depositSource: source || "onramper",
         }),
 
-      depositDetected: (amount: number) =>
-        set({
-          stage: "deposit_detected",
-          depositAmount: amount,
-        }),
+      depositDetected: (amount: number, tokenSymbol: DepositTokenSymbol = "STRK") =>
+        set({ stage: "deposit_detected", depositAmount: amount, depositTokenSymbol: tokenSymbol }),
 
       setStage: (stage: SwapStage) => set({ stage, errorMessage: null }),
 
@@ -159,32 +148,29 @@ export const useSwapStore = create<SwapState>()(
         onrampStatus: state.onrampStatus,
         onrampTransactionId: state.onrampTransactionId,
         initialStrkBalance: state.initialStrkBalance,
+        initialUsdcBalance: state.initialUsdcBalance,
         walletAddress: state.walletAddress,
         depositAmount: state.depositAmount,
+        depositTokenSymbol: state.depositTokenSymbol,
+        depositSource: state.depositSource,
       }),
       merge: (persistedState, currentState) => {
         const state = persistedState as Partial<SwapState>;
-
-        // If the persisted flow was interrupted mid-tx, fall back to a safe stage.
-        // Prefer deposit_detected when we have a known deposit amount; otherwise
-        // resume waiting_deposit so the watcher can detect the next balance change.
         const stage = state.stage;
         const isInterrupted = stage === "quoting" || stage === "swapping" || stage === "minting";
         const safeStage = isInterrupted
           ? (state.depositAmount && state.depositAmount > 0 ? "deposit_detected" : "waiting_deposit")
           : stage;
 
-        // Don't resume canceled/failed flows
         const onrampStatus = state.onrampStatus;
         if (onrampStatus === "canceled" || onrampStatus === "failed") {
-          return currentState; // discard
+          return currentState;
         }
 
         return {
           ...currentState,
           ...state,
           stage: safeStage ?? currentState.stage,
-          // Always reset transient fields on rehydration
           isSwapping: false,
           errorMessage: null,
           popupDismissed: false,

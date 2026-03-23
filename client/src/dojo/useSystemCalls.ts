@@ -20,8 +20,6 @@ import { useSnackbar } from "notistack";
 import { CairoOption, CairoOptionVariant, CallData, byteArray, num } from "starknet";
 import { useGameTokens } from "./useGameTokens";
 
-const TICKET_PRICE_WEI = BigInt("1000000000000000000");
-
 export const useSystemCalls = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { getBeastTokenURI, getAdventurerState } = useStarknetApi();
@@ -46,6 +44,10 @@ export const useSystemCalls = () => {
     namespace,
     "game_token_systems"
   )?.address;
+
+  const executeCalls = async (account: any, calls: any[]) => {
+    return account.execute(calls);
+  };
   const SETTINGS_ADDRESS = getContractByName(
     currentNetworkConfig.manifest,
     namespace,
@@ -196,7 +198,8 @@ export const useSystemCalls = () => {
     preCalls: any[],
     amount: number,
     callback: () => void,
-    recipientAddress?: string
+    recipientAddress?: string,
+    gasTokenAddress?: string
   ) => {
     let paymentData =
       payment.paymentType === "Ticket"
@@ -213,21 +216,22 @@ export const useSystemCalls = () => {
     }
 
     try {
-      let tx = await account!.execute(
-        [
-          ...preCalls,
-          ...Array.from({ length: amount }, () => ({
-              contractAddress: DUNGEON_ADDRESS,
-              entrypoint: "buy_game",
-              calldata: CallData.compile([
-                ...paymentData,
-                new CairoOption(CairoOptionVariant.Some, stringToFelt(name)),
-                recipient, // send game to this address
-                false, // soulbound
-              ]),
-            })),
-        ]
-      );
+      const calls = [
+        ...preCalls,
+        ...Array.from({ length: amount }, () => ({
+            contractAddress: DUNGEON_ADDRESS,
+            entrypoint: "buy_game",
+            calldata: CallData.compile([
+              ...paymentData,
+              new CairoOption(CairoOptionVariant.Some, stringToFelt(name)),
+              recipient, // send game to this address
+              false, // soulbound
+            ]),
+          })),
+      ];
+
+      void gasTokenAddress;
+      const tx = await executeCalls(account, calls);
 
       callback();
 
