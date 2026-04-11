@@ -30,10 +30,6 @@ interface UIState {
   setShowUntilBeastToggle: (show: boolean) => void
   showUntilBeastToggle: boolean
 
-  // Referral tracking
-  referralClicked: boolean
-  setReferralClicked: (clicked: boolean) => void
-
   // Advanced mode (always enabled, toggle is no-op)
   setAdvancedMode: (advanced: boolean) => void
   advancedMode: boolean
@@ -86,10 +82,6 @@ export const useUIStore = create<UIState>()(
       setUseMobileClient: (useMobile) => set({ useMobileClient: useMobile }),
       useMobileClient: false,
 
-      // Referral tracking
-      referralClicked: false,
-      setReferralClicked: (clicked) => set({ referralClicked: clicked }),
-
       // Payment preferences
       defaultPaymentToken: 'LORDS',
       setDefaultPaymentToken: (token) => set({ defaultPaymentToken: token }),
@@ -103,7 +95,6 @@ export const useUIStore = create<UIState>()(
         fastBattle: state.fastBattle,
         skipFirstBattle: state.skipFirstBattle,
         showUntilBeastToggle: state.showUntilBeastToggle,
-        referralClicked: state.referralClicked,
         advancedMode: state.advancedMode,
         defaultPaymentToken: state.defaultPaymentToken,
         showItemStats: state.showItemStats,

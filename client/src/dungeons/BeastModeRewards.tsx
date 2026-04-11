@@ -4,7 +4,6 @@ import {
   useStatistics,
   TierData,
 } from "@/contexts/Statistics";
-import { useUIStore } from "@/stores/uiStore";
 import { formatRewardNumber } from "@/utils/utils";
 import {
   Box,
@@ -12,70 +11,25 @@ import {
   LinearProgress,
   Link,
   Skeleton,
-  Tab,
-  Tabs,
   Tooltip,
   Typography,
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { isMobile } from "react-device-detect";
-import { useState } from "react";
-import ReferralTab from "@/components/ReferralTab";
-
 export default function BeastModeRewards() {
   const { strkPrice, beastTierData, survivorTokenPrice } = useStatistics();
-  const { useMobileClient } = useUIStore();
   const { remainingSurvivorTokens, collectedBeasts } = useStatistics();
   const beastsRemaining = totalCollectableBeasts - collectedBeasts;
   const BEAST_ENTITLEMENTS_ORIGINAL = 931500;
-  
-  const [activeTab, setActiveTab] = useState(0);
-
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
-
-  // Mobile shows just rewards content (Refer & Earn is separate button)
-  if (isMobile || useMobileClient) {
-    return (
-      <RewardsContent 
-        remainingSurvivorTokens={remainingSurvivorTokens}
-        BEAST_ENTITLEMENTS_ORIGINAL={BEAST_ENTITLEMENTS_ORIGINAL}
-        beastsRemaining={beastsRemaining}
-        strkPrice={strkPrice}
-        beastTierData={beastTierData}
-        survivorTokenPrice={survivorTokenPrice}
-      />
-    );
-  }
 
   return (
-    <>
-      <Box sx={styles.tabsContainer}>
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          sx={styles.tabs}
-          TabIndicatorProps={{ sx: { bgcolor: "#d7c529" } }}
-        >
-          <Tab label="Refer & Earn" sx={styles.tab} />
-          <Tab label="Dungeon Rewards" sx={styles.tab} />
-        </Tabs>
-      </Box>
-
-      {activeTab === 0 && <ReferralTab />}
-
-      {activeTab === 1 && (
-        <RewardsContent
-          remainingSurvivorTokens={remainingSurvivorTokens}
-          BEAST_ENTITLEMENTS_ORIGINAL={BEAST_ENTITLEMENTS_ORIGINAL}
-          beastsRemaining={beastsRemaining}
-          strkPrice={strkPrice}
-          beastTierData={beastTierData}
-          survivorTokenPrice={survivorTokenPrice}
-        />
-      )}
-    </>
+    <RewardsContent
+      remainingSurvivorTokens={remainingSurvivorTokens}
+      BEAST_ENTITLEMENTS_ORIGINAL={BEAST_ENTITLEMENTS_ORIGINAL}
+      beastsRemaining={beastsRemaining}
+      strkPrice={strkPrice}
+      beastTierData={beastTierData}
+      survivorTokenPrice={survivorTokenPrice}
+    />
   );
 }
 
@@ -301,44 +255,6 @@ function RewardsContent({
 }
 
 const styles = {
-  tabsContainer: {
-    width: "calc(100% + 40px)",
-    mx: -2.5,
-    mt: -2.5,
-    mb: 1.5,
-    borderBottom: "1px solid rgba(208, 201, 141, 0.2)",
-  },
-  tabsContainerMobile: {
-    width: "100%",
-    mx: 0,
-    mt: 0,
-  },
-  tabs: {
-    minHeight: "36px",
-    width: "100%",
-    "& .MuiTabs-flexContainer": {
-      width: "100%",
-    },
-    "& .MuiTabs-indicator": {
-      bottom: 0,
-      height: 2,
-    },
-  },
-  tab: {
-    minHeight: "36px",
-    width: "50%",
-    maxWidth: "none",
-    fontSize: "0.85rem",
-    fontWeight: 500,
-    color: "rgba(208, 201, 141, 0.6)",
-    letterSpacing: 0.3,
-    textTransform: "none",
-    px: 0,
-    py: 1,
-    "&.Mui-selected": {
-      color: "#d7c529",
-    },
-  },
   stackedContainer: {
     display: "flex",
     flexDirection: "column",

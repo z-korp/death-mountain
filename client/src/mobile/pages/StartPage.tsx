@@ -9,9 +9,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import SchoolIcon from "@mui/icons-material/School";
-import ShareIcon from "@mui/icons-material/Share";
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
-import ReferralTab from "@/components/ReferralTab";
 
 import { Box, Button, Divider, Typography } from "@mui/material";
 import { useAccount } from "@starknet-react/core";
@@ -32,7 +30,6 @@ export default function LandingPage() {
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showDungeonRewards, setShowDungeonRewards] = useState(false);
-  const [showReferral, setShowReferral] = useState(false);
 
   const handleMainButtonClick = () => {
     if (dungeon.externalLink) {
@@ -119,8 +116,7 @@ export default function LandingPage() {
         >
           {!showGames &&
             !showLeaderboard &&
-            !showDungeonRewards &&
-            !showReferral && (
+            !showDungeonRewards && (
             <>
               <Box sx={styles.headerBox}>
                 <Typography sx={styles.gameTitle}>LOOT SURVIVOR</Typography>
@@ -267,34 +263,19 @@ export default function LandingPage() {
               </Button>
 
               {dungeon.ticketAddress && (
-                <>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    size="large"
-                    color="secondary"
-                    onClick={() => setShowDungeonRewards(true)}
-                    startIcon={<EmojiEventsIcon />}
-                    sx={{ height: "36px", mt: 1 }}
-                  >
-                    <Typography variant="h5" color="#111111">
-                      Dungeon Rewards
-                    </Typography>
-                  </Button>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    size="large"
-                    color="secondary"
-                    onClick={() => setShowReferral(true)}
-                    startIcon={<ShareIcon />}
-                    sx={{ height: "36px", mt: 1, mb: 2 }}
-                  >
-                    <Typography variant="h5" color="#111111">
-                      Refer & Earn
-                    </Typography>
-                  </Button>
-                </>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  color="secondary"
+                  onClick={() => setShowDungeonRewards(true)}
+                  startIcon={<EmojiEventsIcon />}
+                  sx={{ height: "36px", mt: 1, mb: 2 }}
+                >
+                  <Typography variant="h5" color="#111111">
+                    Dungeon Rewards
+                  </Typography>
+                </Button>
               )}
 
               {dungeon.ticketAddress && <PriceIndicator />}
@@ -344,40 +325,7 @@ export default function LandingPage() {
             </>
           )}
 
-          {showReferral && (
-            <>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  justifyContent: "center",
-                }}
-              >
-                <Box sx={styles.adventurersHeader}>
-                  <Button
-                    variant="text"
-                    size="large"
-                    onClick={() => setShowReferral(false)}
-                    sx={styles.backButton}
-                    startIcon={
-                      <ArrowBackIcon fontSize="large" sx={{ mr: 1 }} />
-                    }
-                  >
-                    <Typography variant="h4" color="primary">
-                      Refer & Earn
-                    </Typography>
-                  </Button>
-                </Box>
-              </Box>
 
-              <Box
-                sx={{ width: "100%", maxHeight: "450px", overflowY: "auto" }}
-              >
-                <ReferralTab />
-              </Box>
-            </>
-          )}
         </Box>
       </Box>
 
