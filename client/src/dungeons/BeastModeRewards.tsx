@@ -22,14 +22,22 @@ export default function BeastModeRewards() {
   const BEAST_ENTITLEMENTS_ORIGINAL = 931500;
 
   return (
-    <RewardsContent
-      remainingSurvivorTokens={remainingSurvivorTokens}
-      BEAST_ENTITLEMENTS_ORIGINAL={BEAST_ENTITLEMENTS_ORIGINAL}
-      beastsRemaining={beastsRemaining}
-      strkPrice={strkPrice}
-      beastTierData={beastTierData}
-      survivorTokenPrice={survivorTokenPrice}
-    />
+    <>
+      <Box sx={styles.headerContainer}>
+        <Typography variant="h4" sx={styles.headerTitle}>
+          Dungeon Rewards
+        </Typography>
+        <Box sx={styles.headerDivider} />
+      </Box>
+      <RewardsContent
+        remainingSurvivorTokens={remainingSurvivorTokens}
+        BEAST_ENTITLEMENTS_ORIGINAL={BEAST_ENTITLEMENTS_ORIGINAL}
+        beastsRemaining={beastsRemaining}
+        strkPrice={strkPrice}
+        beastTierData={beastTierData}
+        survivorTokenPrice={survivorTokenPrice}
+      />
+    </>
   );
 }
 
@@ -255,6 +263,28 @@ function RewardsContent({
 }
 
 const styles = {
+  headerContainer: {
+    width: "calc(100% + 40px)",
+    mx: -2.5,
+    mt: -2.5,
+    mb: 1.5,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  headerTitle: {
+    fontWeight: 700,
+    color: "#d7c529",
+    letterSpacing: 1.5,
+    textTransform: "uppercase",
+    textAlign: "center",
+    py: 1.5,
+  },
+  headerDivider: {
+    width: "100%",
+    height: "2px",
+    background: "linear-gradient(90deg, transparent 0%, #d7c529 50%, transparent 100%)",
+  },
   stackedContainer: {
     display: "flex",
     flexDirection: "column",
