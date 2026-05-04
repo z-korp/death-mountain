@@ -38,7 +38,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/maintenance.html"
     }
   ]
 }
