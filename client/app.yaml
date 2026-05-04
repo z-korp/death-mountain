@@ -6,8 +6,8 @@ handlers:
     upload: dist/.*\..+$
 
   - url: /.*
-    static_files: dist/index.html
-    upload: dist/index.html
+    static_files: dist/maintenance.html
+    upload: dist/maintenance.html
     secure: always
 
 env_variables:
