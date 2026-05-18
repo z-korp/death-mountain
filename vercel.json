@@ -29,6 +29,12 @@
   ],
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "death-mountain-coral.vercel.app" }],
+      "destination": "https://lootadventurer.xyz/:path*",
+      "permanent": true
+    },
+    {
       "source": "/:path((?!maintenance\\.html$|assets/.*|images/.*|api/.*|favicon\\.png$|banner\\.png$|manifest\\.json$|robots\\.txt$).*)",
       "destination": "/maintenance.html",
       "permanent": false
